@@ -1,0 +1,57 @@
+# ============================================
+# Unity 项目 .gitignore
+# 适用于 Unity 工程位于仓库子目录 "My project/" 的布局
+# 模式均未锚定根目录，可匹配任意层级
+# ============================================
+
+# ---- Unity 自动生成的临时/缓存/构建目录（不可提交，体积大且与本机相关）----
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# ---- IDE / 代码编辑器生成的解决方案与工程文件 ----
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.unityproj
+
+# ---- 编辑器工作区元数据 ----
+.vs/
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# ---- Unity 构建产物 ----
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# ---- 其他 ----
+crashlytics-build.properties
+sysinfo.txt
+*.binarypb
+
+# ============================================
+# 以下内容应被纳入版本控制（不要忽略）：
+#   Assets/          — 所有游戏资源与脚本
+#   Packages/        — 包清单 manifest.json / packages-lock.json
+#   ProjectSettings/ — 工程设置（版本、质量、输入等）
+# ============================================

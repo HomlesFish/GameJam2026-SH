@@ -235,7 +235,7 @@ MonoBehaviour:
   audioMaxDistance: 8
   uiIcon: {fileID: 0}
   uiSoundClip: {fileID: 0}
-  itemName: "\u672A\u77E5\u7269\u54C1"
+  itemName: "\u5F55\u97F3\u91D1\u5C5E\u9632\u6C34\u7B52"
   score: 10
   salvageable: 1
   destructible: 0

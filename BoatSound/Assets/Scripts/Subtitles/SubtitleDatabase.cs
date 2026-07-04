@@ -62,9 +62,6 @@ namespace GameJam2026
         /// <summary>懒构建 id → 条目 索引；重复 id 取第一个并向控制台告警。</summary>
         private void EnsureIndexed()
         {
-            string firstId = (entries != null && entries.Count > 0 && entries[0] != null) ? entries[0].Id : "<空>";
-            Debug.Log($"[SubtitleDB] 进入: _indexed={_indexed}, entries.Count={(entries != null ? entries.Count : -1)}, _lookup.Count={_lookup.Count}, entries[0].Id='{firstId}', instance={GetInstanceID()}, frame={Time.frameCount}");
-            // 只在「确实已建好且有内容」时跳过；_lookup 为空就重建，杜绝被 stale 的 _indexed 卡成空索引
             if (_indexed && _lookup.Count > 0) return;
             _lookup.Clear();
             if (entries != null)

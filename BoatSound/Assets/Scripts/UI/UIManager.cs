@@ -27,7 +27,6 @@ namespace GameJam2026
         protected override void Awake()
         {
             base.Awake();   // 完成单例注册（必须调用）
-            HideAll();
         }
 
         private void OnEnable() => SafeSubscribe();

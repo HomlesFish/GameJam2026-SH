@@ -16,7 +16,7 @@ namespace GameJam2026
     /// 实现：Transform + 手写速度积分（不用 Rigidbody），便于精确控制延迟与线性减速。
     /// 船贴图请以 +Y 方向作为“船头”。
     /// </summary>
-    public class BoatController : MonoBehaviour
+    public class BoatController : MonoBehaviour, IGameEventListener
     {
         [Header("推进")]
         [Tooltip("加速度（单位/秒²）。按住 W 时每秒增加的速度。")]
@@ -38,6 +38,9 @@ namespace GameJam2026
 
         [Tooltip("抛锚按键。")]
         [SerializeField] private KeyCode anchorKey = KeyCode.Space;
+        
+        [Tooltip("碰撞暗礁后的免疫时长（秒），防止重叠时持续掉电")]
+        [SerializeField] private float reefHitCooldown = 1f;
 
         [Header("运行时状态（调试只读）")]
         [SerializeField] private float currentSpeed;
@@ -53,6 +56,9 @@ namespace GameJam2026
         // 抛锚
         private float _anchorElapsed;
         private float _anchorStartSpeed;
+
+        // 暗礁碰撞免疫冷却
+        private float _reefCooldown;
 
         private void Awake()
         {
@@ -80,6 +86,7 @@ namespace GameJam2026
             }
 
             ApplyMotion(dt);
+            if (_reefCooldown > 0f) _reefCooldown -= dt;
         }
 
         /// <summary>加速：按住 W（或上方向键）时累加速度，封顶 maxSpeed。松开不自动减速。</summary>
@@ -157,6 +164,50 @@ namespace GameJam2026
             // heading 的增量约定为顺时针（与上方 forward=(sinθ,cosθ) 一致）；
             // Unity 的 +Z 旋转是逆时针，故这里取负，使精灵与行进方向同向。
             transform.eulerAngles = new Vector3(0f, 0f, -heading);
+        }
+
+        // ===== 打捞 / 碰撞 / 失败复活 =====
+
+        /// <summary>打捞操作：消耗电量（默认 5 点，见 BatteryManager.salvageCost）。UI 打捞按钮的 OnClick 可直接绑定本方法。</summary>
+        public void Salvage()
+        {
+            if (BatteryManager.Instance != null) BatteryManager.Instance.ConsumeSalvage();
+        }
+
+        /// <summary>碰撞暗礁：受 reefHitCooldown 免疫保护，避免重叠期间持续掉电。需船挂 Rigidbody2D(Kinematic)+Collider2D、暗礁挂 Collider2D(isTrigger) 并打 Tag "Reef"。</summary>
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!other.CompareTag("Reef")) return;
+            if (_reefCooldown > 0f) return;
+
+            _reefCooldown = reefHitCooldown;
+            if (BatteryManager.Instance != null) BatteryManager.Instance.ConsumeReefHit();
+        }
+
+        // ===== 失败复活：监听电量耗尽，复活时把船停住 =====
+
+        private void OnEnable()
+        {
+            EventBus.Subscribe(GameEvents.PlayerDied, this);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe(GameEvents.PlayerDied, this);
+        }
+
+        /// <inheritdoc />
+        public void OnEventRaised(string eventId)
+        {
+            if (eventId == GameEvents.PlayerDied)
+            {
+                // 复活：船已被传送回港口，这里把运动状态清零，避免带着速度漂走 / 再撞暗礁
+                currentSpeed = 0f;
+                anchoring = false;
+                _leftTimer = _rightTimer = 0f;
+                _leftEngaged = _rightEngaged = false;
+                _reefCooldown = 0f;
+            }
         }
 
         // ===== 预留扩展点（后续阶段填充）=====

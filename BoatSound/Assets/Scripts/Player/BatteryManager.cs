@@ -6,18 +6,17 @@ namespace GameJam2026
     /// <summary>
     /// 玩家电量（续航）管理器（单例）。
     /// 电量是统一消耗资源：打捞 / 听声 / 碰暗礁 都扣电；电量归 0 触发失败 → 复活续玩
-    /// （传送回港口、重置电量、继续游戏）。
+    /// （重置电量、继续游戏；船复位回出生点由 <see cref="GameManager"/> 负责）。
     ///
-    /// 用法：场景里建空 GameObject 挂本脚本；把船拖进 boat，港口空物体拖进 port（不填则用船初始位置）。
+    /// 用法：场景里建空 GameObject 挂本脚本。
+    /// 失败复活：电量归 0 时只负责重置电量并广播 <see cref="GameEvents.PlayerDied"/>；
+    /// 船的传送回出生点由 GameManager 监听该事件负责。
     /// 其他系统联动：
     ///   - UI：订阅 <see cref="OnBatteryChanged"/> 刷新电量条；
-    ///   - 失败/复活：订阅 <see cref="EventBus"/> 事件 <see cref="GameEvents.PlayerDied"/>。
+    ///   - 复活编排：见上，由 GameManager 统一负责。
     /// </summary>
-    public class BatteryManager : MonoBehaviour
+    public class BatteryManager : SingletonBehaviour<BatteryManager>
     {
-        // ===== 单例访问（全局唯一入口）=====
-        public static BatteryManager Instance { get; private set; }
-
         [Header("电量")]
         [Tooltip("电量上限")]
         [SerializeField] private int maxBattery = 100;
@@ -35,13 +34,6 @@ namespace GameJam2026
         [Tooltip("每次碰撞暗礁消耗")]
         [SerializeField] private int reefDamage = 20;
 
-        [Header("失败 / 复活")]
-        [Tooltip("玩家船（复活时用于传送）。强烈建议指定。")]
-        [SerializeField] private Transform boat;
-
-        [Tooltip("港口复活点（不指定则用游戏开始时船的位置）")]
-        [SerializeField] private Transform port;
-
         /// <summary>当前电量（0 ~ <see cref="MaxBattery"/>）。</summary>
         public int CurrentBattery { get; private set; }
 
@@ -54,20 +46,12 @@ namespace GameJam2026
         /// <summary>电量变化事件：(当前电量, 上限)。UI 订阅以刷新电量条。</summary>
         public event Action<int, int> OnBatteryChanged;
 
-        /// <summary>电量首次归 0 时触发一次（在复活重置之前）。可用于播放失败音效/闪屏等。</summary>
+        /// <summary>电量首次归 0 时触发一次（在重置之前）。可用于播放失败音效/闪屏等。</summary>
         public event Action OnBatteryEmpty;
 
-        // 复活点（Start 时确定：port 优先，否则船初始位置）
-        private Vector3 _respawnPosition;
-
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
+            base.Awake();   // 完成单例注册（必须调用）
 
             // 在 Awake 就把初值设好，确保任何在 OnEnable/Start 订阅的 UI 都能读到正确值
             CurrentBattery = Mathf.Clamp(startBattery, 0, maxBattery);
@@ -75,14 +59,7 @@ namespace GameJam2026
 
         private void Start()
         {
-            // 确定复活点：指定了港口用港口，否则用船的初始位置
-            if (port != null) _respawnPosition = port.position;
-            else if (boat != null) _respawnPosition = boat.position;
-            else _respawnPosition = Vector3.zero;
-
-            if (boat == null)
-                Debug.LogWarning("[BatteryManager] 未指定 boat，电量归 0 时无法传送复活（仅重置电量）。", this);
-
+            // Start 时所有 Awake 已跑完：补发一次，确保晚订阅的 UI 也能拿到初始电量
             FireChanged();
         }
 
@@ -121,15 +98,9 @@ namespace GameJam2026
         {
             // 此时 CurrentBattery 仍为 0；订阅者可据此播放失败反馈
             OnBatteryEmpty?.Invoke();
-            EventBus.Raise(GameEvents.PlayerDied); // 失败提示 / 音乐 / 船速清零 等可订阅
-            Respawn();
-        }
-
-        /// <summary>复活：传送船回港口并重置电量。（船速清零由 BoatController 监听 PlayerDied 自行处理。）</summary>
-        private void Respawn()
-        {
-            if (boat != null) boat.position = _respawnPosition;
-            ResetBattery();
+            // 广播失败：GameManager 传送船回出生点、BoatController 清速、DepthChargeLauncher 补弹
+            EventBus.Raise(GameEvents.PlayerDied);
+            ResetBattery();   // 本管理器只负责重置电量；传送职责已交给 GameManager
         }
 
         private void FireChanged()

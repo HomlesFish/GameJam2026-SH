@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f85dcf0077142e3a401c0dab54eda6c, type: 3}
+  m_Name: SubtitleDatabase
+  m_EditorClassIdentifier: 
+  entries:
+  - id: 1001
+    text: 123456
+    voice: {fileID: 0}
+  - id: HarborNoObjective
+    text: 未获得主要物品，无法进行结算
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}
+  - id: 
+    text: 
+    voice: {fileID: 0}

@@ -11,6 +11,15 @@ namespace GameJam2026
     ///   音量随到船（AudioListener）的距离衰减、带左右方向。
     ///
     /// 普通目标平时隐藏（alpha=0）；被 SonarSystem 扫描命中且在范围内时由 OnPing() 闪现一次。
+    ///
+    /// 打捞：<see cref="salvageable"/> 默认为 true——所有被探测物体都可被船近距离打捞；
+    /// 暗礁等不可打捞物取消勾选。打捞后用 <see cref="itemName"/> 作为货舱里显示的名字，物品从场景移除。
+    ///
+    /// 深水炸弹：<see cref="destructible"/> 标记能否被深水炸弹摧毁（暗礁/鱼群/海豚勾选）。
+    /// <see cref="isObjective"/>（主线任务目标）恒免疫，不受深水炸弹影响。
+    ///
+    /// HUD 目标物品：主线目标（isObjective）的 <see cref="uiIcon"/> 与 <see cref="uiSoundClip"/> 由 SonarUIController 读取，
+    /// 显示在 HUD 左上角（图标 + 喇叭音效）；**每关不同**，在该关的主线目标上配置即可，UI 会自动取用。
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class SonarTarget : MonoBehaviour
@@ -37,9 +46,47 @@ namespace GameJam2026
         [Tooltip("3D 声音衰减最大距离（单位）。超出此距离基本听不见")]
         [SerializeField] private float audioMaxDistance = 8f;
 
+        [Header("HUD 目标物品（仅 isObjective 时由 SonarUIController 读取）")]
+        [Tooltip("HUD 左上角显示的目标物品图标。每关不同——在该关的主线目标（isObjective）上配置")]
+        [SerializeField] private Sprite uiIcon;
+
+        [Tooltip("HUD 喇叭按钮点击播放的音效（船锚撞击目标物品）。留空则回退用上面的 overrideClip")]
+        [SerializeField] private AudioClip uiSoundClip;
+
+        [Header("打捞")]
+        [Tooltip("打捞后显示在货舱 UI 里的物品名字")]
+        [SerializeField] private string itemName = "未知物品";
+
+        [Tooltip("该物品的积分（打捞后累加到货舱总分）")]
+        [SerializeField] private int score = 10;
+
+        [Tooltip("是否可被打捞。默认勾选（所有被探测物体都可打捞）；暗礁等不可打捞物取消勾选")]
+        [SerializeField] private bool salvageable = true;
+
+        [Tooltip("是否可被深水炸弹摧毁。暗礁/鱼群/海豚勾选；任务目标由 isObjective 自动免疫。默认不勾选——也可不改此项，直接给物体打 Tag(Reef/Fish/Dolphin) 标记为可摧毁")]
+        [SerializeField] private bool destructible;
+
         public SonarBand Band => band;
         public bool IsObjective => isObjective;
         public AudioClip OverrideClip => overrideClip;
+
+        /// <summary>HUD 左上角显示的目标物品图标（每关在该关主线目标上配置）。</summary>
+        public Sprite UiIcon => uiIcon;
+
+        /// <summary>HUD 喇叭按钮音效；留空回退 <see cref="OverrideClip"/>。</summary>
+        public AudioClip GetUiSoundClip() => uiSoundClip != null ? uiSoundClip : overrideClip;
+
+        /// <summary>打捞后显示在货舱里的物品名字。</summary>
+        public string ItemName => itemName;
+
+        /// <summary>该物品的积分。</summary>
+        public int Score => score;
+
+        /// <summary>是否可被打捞（暗礁等设为 false）。</summary>
+        public bool Salvageable => salvageable;
+
+        /// <summary>是否可被深水炸弹摧毁（暗礁/鱼群/海豚设为 true；任务目标恒免疫）。</summary>
+        public bool Destructible => destructible;
 
         private SpriteRenderer _renderer;
         private AudioSource _audio;

@@ -18,10 +18,8 @@ namespace GameJam2026
     /// 扫描线 / 扫描环均为程序化生成的 LineRenderer，无需美术资源、无需额外场景接线；挂在空 GameObject 上、把 Boat 拖进 boat 即可。
     /// 注意：3D 距离音需把 AudioListener 放在船上（从相机移过来），听者才在船的位置。
     /// </summary>
-    public class SonarSystem : MonoBehaviour
+    public class SonarSystem : SingletonBehaviour<SonarSystem>
     {
-        public static SonarSystem Instance { get; private set; }
-
         [Header("雷达")]
         [Tooltip("雷达中心（通常是船）")]
         [SerializeField] private Transform boat;
@@ -107,38 +105,72 @@ namespace GameJam2026
         private float _ringTimer;
         private Material _defaultLineMat;             // 程序化线材质（缓存复用，扫描线/扫描环共用）
 
-        private void Awake()
+        private bool _active;   // 是否激活扫描（仅 Playing；菜单/暂停/结算/通关时停转）
+
+        private void OnEnable() => SafeSubscribe();
+
+        private void OnDisable()
         {
-            if (Instance != null && Instance != this)
+            if (GameManager.Instance != null)
+                GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        }
+
+        /// <summary>幂等订阅 GameManager.OnStateChanged（重复调用不会多次订阅）。防 OnEnable 早于 GameManager.Awake 漏订。</summary>
+        private void SafeSubscribe()
+        {
+            if (GameManager.Instance == null) return;
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
+            GameManager.Instance.OnStateChanged += HandleStateChanged;
+            // 启动时若已在 Playing（如直接以 Playing 开局），立即激活
+            if (GameManager.Instance.CurrentState == GameManager.GameState.Playing) Activate();
+        }
+
+        /// <summary>游戏状态变化：进入 Playing 激活扫描（发首个声呐环/全闪）；其它状态停转。</summary>
+        private void HandleStateChanged(GameManager.GameState newState, GameManager.GameState oldState)
+        {
+            if (newState == GameManager.GameState.Playing) Activate();
+            else _active = false;
+        }
+
+        /// <summary>激活扫描：刷新目标缓存并按模式发出首个扫描（开局即有反馈，不必空等一个间隔）。</summary>
+        private void Activate()
+        {
+            _active = true;
+            if (boat == null) return;
+            RefreshTargetCache();
+            if (useRingScan)
             {
-                Destroy(gameObject);
-                return;
+                SpawnRing();
+                _ringTimer = 0f;
             }
-            Instance = this;
+            else
+            {
+                Scan();
+            }
         }
 
         private void Start()
         {
+            // boat 未指定则从 GameManager 取（统一真相源），消除每处重复接线
+            if (boat == null && GameManager.Instance != null && GameManager.Instance.Boat != null)
+                boat = GameManager.Instance.Boat.transform;
+
             UpdateBandLabel();
             if (boat == null)
                 Debug.LogWarning("[SonarSystem] 未指定 boat（雷达中心），扫描将无效。", this);
 
             if (showSweepLine) CreateSweepLine();
 
-            if (useRingScan)
-            {
-                RefreshTargetCache(); // 声呐环揭示需要目标缓存
-                SpawnRing();          // 开局立即发一个声呐环，避免空等一个间隔
-                _ringTimer = 0f;
-            }
-            else
-            {
-                Scan();           // 未启用声呐环：旧模式开局立即全闪一次
-            }
+            // 补订阅（防 OnEnable 早于 GameManager.Awake 漏订）
+            SafeSubscribe();
+
+            // 扫描（扫描线旋转 / 声呐环扩散）只在 Playing 时工作，由 HandleStateChanged→Activate 启动，
+            // 避免菜单阶段就开始扫描。扫描线在此创建，但 Update 未激活时不旋转。
         }
 
         private void Update()
         {
+            if (!_active) return;   // 非游戏进行中（菜单/暂停/结算/通关）：雷达停转
             HandleBandSwitch();
 
             // 旋转扫描线（纯视觉）

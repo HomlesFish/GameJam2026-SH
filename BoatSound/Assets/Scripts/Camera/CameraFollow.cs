@@ -19,6 +19,13 @@ namespace GameJam2026
         [Tooltip("未锁定时的跟随平滑度，越大跟得越紧")]
         [SerializeField] private float smooth = 10f;
 
+        private void Start()
+        {
+            // target 未指定则从 GameManager 取（统一真相源）
+            if (target == null && GameManager.Instance != null && GameManager.Instance.Boat != null)
+                target = GameManager.Instance.Boat.transform;
+        }
+
         private void LateUpdate()
         {
             if (target == null) return;

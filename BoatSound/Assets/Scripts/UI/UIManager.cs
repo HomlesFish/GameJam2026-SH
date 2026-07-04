@@ -12,25 +12,54 @@ namespace GameJam2026
     ///   3) 在 Inspector 的 panels 列表中注册：填写名称 + 拖入对应根节点；
     ///   4) 代码或按钮调用 UIManager.Instance.ShowOnly("MainMenu") 即可。
     /// </summary>
-    public class UIManager : MonoBehaviour
+    public class UIManager : SingletonBehaviour<UIManager>
     {
-        public static UIManager Instance { get; private set; }
-
         [Header("UI 面板注册表（在 Inspector 中拖入）")]
         [Tooltip("所有 UI 面板；名称用于代码查找，root 为面板根节点 GameObject")]
         [SerializeField] private UIPanel[] panels;
 
-        private void Awake()
+        [Tooltip("主菜单根节点（如 StartUI）。进入游戏时自动隐藏，回到主菜单时自动显示；不接则不自动切换")]
+        [SerializeField] private GameObject mainMenuRoot;
+
+        // 跨场景常驻；若 UI 需随场景切换，把此属性改为返回 false
+        protected override bool PersistOnLoad => true;
+
+        protected override void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-            // 如 UI 需随场景切换，注释掉下一行即可
-            DontDestroyOnLoad(gameObject);
+            base.Awake();   // 完成单例注册（必须调用）
             HideAll();
+        }
+
+        private void OnEnable() => SafeSubscribe();
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
+                GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        }
+
+        private void Start()
+        {
+            // 补订阅（防 OnEnable 早于 GameManager.Awake 漏订），并应用当前状态
+            SafeSubscribe();
+        }
+
+        private void SafeSubscribe()
+        {
+            if (GameManager.Instance == null) return;
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
+            GameManager.Instance.OnStateChanged += HandleStateChanged;
+            ApplyState(GameManager.Instance.CurrentState);
+        }
+
+        /// <summary>游戏状态变化时切换主菜单显隐。</summary>
+        private void HandleStateChanged(GameManager.GameState newState, GameManager.GameState oldState)
+            => ApplyState(newState);
+
+        private void ApplyState(GameManager.GameState state)
+        {
+            if (mainMenuRoot != null)
+                mainMenuRoot.SetActive(state == GameManager.GameState.MainMenu);
         }
 
         /// <summary>只显示指定名称的面板，其余全部隐藏。</summary>

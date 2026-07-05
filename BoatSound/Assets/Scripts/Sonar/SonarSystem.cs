@@ -105,7 +105,7 @@ namespace GameJam2026
         private float _ringTimer;
         private Material _defaultLineMat;             // 程序化线材质（缓存复用，扫描线/扫描环共用）
 
-        private bool _active;   // 是否激活扫描（仅 Playing；菜单/暂停/结算/通关时停转）
+        private bool _active;   // 是否激活扫描（仅 Playing；其它状态停转并隐藏扫描视觉）
 
         private void OnEnable() => SafeSubscribe();
 
@@ -125,17 +125,39 @@ namespace GameJam2026
             if (GameManager.Instance.CurrentState == GameManager.GameState.Playing) Activate();
         }
 
-        /// <summary>游戏状态变化：进入 Playing 激活扫描（发首个声呐环/全闪）；其它状态停转。</summary>
+        /// <summary>游戏状态变化：进入 Playing 激活扫描（发首个声呐环/全闪）；其它状态停转并隐藏扫描视觉。</summary>
         private void HandleStateChanged(GameManager.GameState newState, GameManager.GameState oldState)
         {
             if (newState == GameManager.GameState.Playing) Activate();
-            else _active = false;
+            else Deactivate();
         }
 
-        /// <summary>激活扫描：刷新目标缓存并按模式发出首个扫描（开局即有反馈，不必空等一个间隔）。</summary>
+        /// <summary>停转扫描并隐藏所有扫描视觉（旋转扫描线 + 残留声呐环）。
+        /// 进入菜单/暂停/结算/通关时调用，避免冻结的扫描线、半圈声呐环残留在画面上。</summary>
+        private void Deactivate()
+        {
+            _active = false;
+            HideScanVisuals();
+        }
+
+        /// <summary>隐藏扫描视觉：关闭扫描线 LineRenderer，销毁所有尚未扩散完的声呐环。</summary>
+        private void HideScanVisuals()
+        {
+            if (_sweepLine != null) _sweepLine.enabled = false;
+
+            for (int i = 0; i < _rings.Count; i++)
+            {
+                PingRing r = _rings[i];
+                if (r != null && r.Line != null) Destroy(r.Line.gameObject);
+            }
+            _rings.Clear();
+        }
+
+        /// <summary>激活扫描：恢复扫描线显示、刷新目标缓存并按模式发出首个扫描（开局即有反馈，不必空等一个间隔）。</summary>
         private void Activate()
         {
             _active = true;
+            if (_sweepLine != null) _sweepLine.enabled = true;
             if (boat == null) return;
             RefreshTargetCache();
             if (useRingScan)

@@ -71,6 +71,11 @@ namespace GameJam2026
 
         private void Update()
         {
+            // 暂停期间冻结操控（ESC 暂停菜单）。timeScale=0 已令 dt=0，此处额外 return
+            // 是为了避免玩家在暂停时按 Space 触发 BeginAnchor 等输入副作用。
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Paused)
+                return;
+
             float dt = Time.deltaTime;
 
             if (anchoring)

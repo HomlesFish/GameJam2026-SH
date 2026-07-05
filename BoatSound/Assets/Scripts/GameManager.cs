@@ -78,12 +78,15 @@ namespace GameJam2026
             if (eventId == GameEvents.PlayerDied) HandlePlayerDied();
         }
 
-        /// <summary>切换游戏状态并广播事件。相同状态不会重复触发。</summary>
+        /// <summary>切换游戏状态并广播事件。相同状态不会重复触发。
+        /// 同时统一管理 <see cref="Time.timeScale"/>：进入 <see cref="GameState.Paused"/> 冻结时间，
+        /// 切到任意其它状态都还原为 1（保证从暂停退出到主菜单/结算/重玩时不会卡在慢速）。</summary>
         public void SetState(GameState newState)
         {
             if (newState == CurrentState) return;
             GameState oldState = CurrentState;
             CurrentState = newState;
+            Time.timeScale = (newState == GameState.Paused) ? 0f : 1f;
             OnStateChanged?.Invoke(newState, oldState);
         }
 
@@ -189,7 +192,23 @@ namespace GameJam2026
 
         public void PauseGame()  => SetState(GameState.Paused);
         public void ResumeGame() => SetState(GameState.Playing);
-        public void QuitToMenu() => SetState(GameState.MainMenu);
+
+        /// <summary>返回主菜单：清空当前关实例后切到 <see cref="GameState.MainMenu"/>
+        ///（暂停菜单「退出」按钮可绑定；timeScale 由 <see cref="SetState"/> 还原）。</summary>
+        public void QuitToMenu()
+        {
+            ClearCurrentLevel();
+            SetState(GameState.MainMenu);
+        }
+
+        /// <summary>重玩当前关：重新加载 <see cref="CurrentLevelIndex"/> 关（重置电量/弹药/货舱，船送回出生点）。
+        /// 暂停菜单「重玩」按钮可绑定；尚未进入任何关卡时退化为 <see cref="StartGame"/>。
+        /// BeginLevel 内部会把状态切回 <see cref="GameState.Playing"/>，故 timeScale 自动还原、面板随之隐藏。</summary>
+        public void ReplayCurrentLevel()
+        {
+            if (CurrentLevelIndex < 0) { StartGame(); return; }
+            BeginLevel(CurrentLevelIndex);
+        }
 
         /// <summary>强制结束（=全通关 GameOver）。保留给「结束游戏」按钮；正常通关流程走 <see cref="ContinueAfterSettle"/>。</summary>
         public void EndGame() => SetState(GameState.GameOver);

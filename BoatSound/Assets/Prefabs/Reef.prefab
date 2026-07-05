@@ -140,7 +140,7 @@ MonoBehaviour:
   uiSoundClip: {fileID: 8300000, guid: a2693ad95a5102c42a83c825c110a2f1, type: 3}
   itemName: "\u7901\u77F3"
   score: 10
-  salvageable: 1
+  salvageable: 0
   destructible: 0
 --- !u!61 &4592319559710318892
 BoxCollider2D:

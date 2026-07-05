@@ -12,6 +12,9 @@ namespace GameJam2026
     ///   - OnShown：实例化一行作为容器最后一个子物体（→ 排在最底），填文本、淡入；
     ///   - OnHidden：按 InstanceId 找到对应行，淡出后销毁。
     ///
+    /// 另订阅 <see cref="GameEvents.LevelStarted"/>：换关时立即清空所有字幕行与进行中的淡变（见 <see cref="ClearAll"/>），
+    /// 避免上一关未播完/未淡出的字幕残留或卡顿到新关卡。
+    ///
     /// 「挤到上面」靠布局实现：建议 stackContainer 挂 Vertical Layout Group，
     /// Child Alignment = Lower Left/Lower Center（整块贴底），新行 append 在最末 → 最底，
     /// 旧行（更靠前的兄弟节点）自然位于其上方；旧行到点被销毁时整块自动上移。
@@ -20,7 +23,7 @@ namespace GameJam2026
     ///   - stackContainer：堆叠容器（建议 Vertical Layout Group，Child Force Expand 宽度可勾以撑满）；
     ///   - rowPrefab：单行预制体，根节点带一个 <see cref="Text"/>（根节点有/无 CanvasGroup 均可，缺省会自动补一个用于淡入淡出）。
     /// </summary>
-    public class SubtitleUIController : MonoBehaviour
+    public class SubtitleUIController : MonoBehaviour, IGameEventListener
     {
         [Tooltip("字幕堆叠容器：建议挂 Vertical Layout Group，Child Alignment = Lower Left/Center（贴底向上堆叠）")]
         [SerializeField] private Transform stackContainer;
@@ -40,6 +43,7 @@ namespace GameJam2026
         private void OnEnable()
         {
             SafeSubscribe();
+            EventBus.Subscribe(GameEvents.LevelStarted, this);
         }
 
         private void OnDisable()
@@ -49,12 +53,43 @@ namespace GameJam2026
                 SubtitleManager.Instance.OnShown -= HandleShown;
                 SubtitleManager.Instance.OnHidden -= HandleHidden;
             }
+            EventBus.Unsubscribe(GameEvents.LevelStarted, this);
         }
 
         private void Start()
         {
             // Start 时所有 Awake 已跑完：补订阅一次，防 OnEnable 早于 SubtitleManager.Awake 时漏订
             SafeSubscribe();
+        }
+
+        /// <inheritdoc />
+        public void OnEventRaised(string eventId)
+        {
+            if (eventId == GameEvents.LevelStarted)
+            {
+                // 换关：立即清掉上一关未播完/未淡出的字幕，确保新关卡字幕干净开播
+                ClearAll();
+            }
+        }
+
+        /// <summary>换关清场：立即停掉所有进行中的淡变、销毁全部字幕行、清空账本。
+        /// 由 <see cref="GameEvents.LevelStarted"/> 触发；<see cref="SubtitleManager"/> 侧同步停掉剧情序列/单条计时/配音。
+        /// 被停掉的淡变不会再回调 onComplete，故这里直接销毁行，不会与 Manager 的 OnHidden 重复销毁同一行。</summary>
+        public void ClearAll()
+        {
+            // 停掉所有进行中的淡入/淡出协程（其 onComplete 不会再触发，下面统一销毁行）
+            foreach (var kv in _fades)
+            {
+                if (kv.Value != null) StopCoroutine(kv.Value);
+            }
+            _fades.Clear();
+
+            // 销毁所有字幕行（即便有个别已 in-flight 的 OnHidden 后到，HandleHidden 找不到行也会安全 no-op）
+            foreach (var kv in _rows)
+            {
+                if (kv.Value != null) Destroy(kv.Value);
+            }
+            _rows.Clear();
         }
 
         /// <summary>幂等订阅 OnShown/OnHidden（重复调用不会多次订阅）。</summary>

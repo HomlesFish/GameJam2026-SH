@@ -131,8 +131,8 @@ namespace GameJam2026
 
             ClearCurrentLevel();
 
-            // 换关：打断上一关尚未播完的剧情字幕序列，避免跨关叠加
-            if (SubtitleManager.Instance != null) SubtitleManager.Instance.StopSequence();
+            // 换关：清掉上一关尚未播完的字幕（剧情序列 + 单条计时 + 配音），避免跨关叠加 / 声音残留
+            if (SubtitleManager.Instance != null) SubtitleManager.Instance.Clear();
 
             if (data.LevelPrefab == null)
             {

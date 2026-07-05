@@ -166,6 +166,16 @@ namespace GameJam2026
             }
         }
 
+        /// <summary>换关清场：停掉剧情序列 + 所有单条字幕的独立计时（HideAfter）+ 配音。
+        /// 不逐条触发 <see cref="OnHidden"/>——UI 侧（<see cref="SubtitleUIController.ClearAll"/>）会自行销毁行，
+        /// 这里若再逐条 OnHidden 会与 UI 清场重复销毁同一行。由 <see cref="GameManager.BeginLevel"/> 换关时调用。</summary>
+        public void Clear()
+        {
+            StopSequence();
+            StopAllCoroutines();   // 停掉所有 HideAfter（单条 Show 的独立计时）；本类只跑序列与 HideAfter，可整体停
+            if (_voice != null) _voice.Stop();
+        }
+
         /// <summary>逐条播放：每条查库→配音→OnShown，等待 displayTime+hideDelay 后 OnHidden，再进下一条。</summary>
         private IEnumerator SequenceRoutine(IList<string> ids)
         {

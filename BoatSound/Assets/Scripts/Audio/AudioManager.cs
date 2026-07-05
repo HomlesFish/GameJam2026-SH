@@ -1,125 +1,125 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameJam2026
 {
     /// <summary>
-    /// ÒôÆµ¹ÜÀíÆ÷£¨µ¥Àı£©¡£ËùÓĞÒôÆµ¼ô¼­ÔÚ Inspector Àï¹«¿ª£¬Ö±½ÓÍÏÈë / Ìæ»»£¬ÎŞĞè¸Ä´úÂë¡£
+    /// éŸ³é¢‘ç®¡ç†å™¨ï¼ˆå•ä¾‹ï¼‰ã€‚æ‰€æœ‰éŸ³é¢‘å‰ªè¾‘åœ¨ Inspector é‡Œå…¬å¼€ï¼Œç›´æ¥æ‹–å…¥ / æ›¿æ¢ï¼Œæ— éœ€æ”¹ä»£ç ã€‚
     ///
-    /// ¼ÓÔØÓÅÏÈ¼¶£ºInspector ÍÏÈëµÄ¼ô¼­ÓÅÏÈ£»Ä³¸ñÁô¿ÕÔò»ØÍË°´ÎÄ¼şÃû´Ó
-    /// Resources/Audio/ ¼ÓÔØ£¨ÎÄ¼şÃû¼ûÃ¿¸ñ Tooltip£©£»Á½±ß¶¼Ã»ÓĞÖ»´ò Warning ²»±¨´í¡£
-    /// ËùÒÔ¿ÉÒÔÏÈÊ²Ã´¶¼²»ÍÏÖ±½ÓÅÜ£¨ÑØÓÃ Resources Ô¼¶¨£©£¬Ö®ºóÏë»»ÄÄÌõÍÏÄÄÌõ¡£
+    /// åŠ è½½ä¼˜å…ˆçº§ï¼šInspector æ‹–å…¥çš„å‰ªè¾‘ä¼˜å…ˆï¼›æŸæ ¼ç•™ç©ºåˆ™å›é€€æŒ‰æ–‡ä»¶åä»
+    /// Resources/Audio/ åŠ è½½ï¼ˆæ–‡ä»¶åè§æ¯æ ¼ Tooltipï¼‰ï¼›ä¸¤è¾¹éƒ½æ²¡æœ‰åªæ‰“ Warning ä¸æŠ¥é”™ã€‚
+    /// æ‰€ä»¥å¯ä»¥å…ˆä»€ä¹ˆéƒ½ä¸æ‹–ç›´æ¥è·‘ï¼ˆæ²¿ç”¨ Resources çº¦å®šï¼‰ï¼Œä¹‹åæƒ³æ¢å“ªæ¡æ‹–å“ªæ¡ã€‚
     ///
-    /// ¡¾×Ô¶¯½Ó¹Ü¡¿»·¾³²ãËæ GameManager ×´Ì¬µ­Èëµ­³ö¡¢´¬ÌåÉëÒ÷Ëæ»ú²¥·Å¡¢
-    /// ÒıÇæËæ´¬ËÙ±äµ÷£¨¶Á BoatController.Speed01£©¡¢µÍµçÁ¿²ãÓë±¨¾¯ßÙËæ BatteryManager ÊÂ¼şÆôÍ£¡¢
-    /// ÔİÍ£È«¾Ö¾²Òô¡£ÒÔÉÏÁã½ÓÏß¡£
+    /// ã€è‡ªåŠ¨æ¥ç®¡ã€‘ç¯å¢ƒå±‚éš GameManager çŠ¶æ€æ·¡å…¥æ·¡å‡ºã€èˆ¹ä½“å‘»åŸéšæœºæ’­æ”¾ã€
+    /// å¼•æ“éšèˆ¹é€Ÿå˜è°ƒï¼ˆè¯» BoatController.Speed01ï¼‰ã€ä½ç”µé‡å±‚ä¸æŠ¥è­¦å“”éš BatteryManager äº‹ä»¶å¯åœã€
+    /// æš‚åœå…¨å±€é™éŸ³ã€‚ä»¥ä¸Šé›¶æ¥çº¿ã€‚
     ///
-    /// ¡¾±»¶¯½Ó¿Ú¡¿°´Å¥ / Å×Ãª / ²¶ÀÌ / ×²½¸ / ±¬Õ¨ / denied / È·ÈÏ¶£ / µ÷Æµ / ÌıÉù ducking / ×ÖÄ»¾²µç,
-    /// ÓÉ¸÷ÏµÍ³Ò»ĞĞµ÷ÓÃ£¨BoatController µÈÒÑ½ÓºÃµÄµ÷ÓÃ²»ÊÜ±¾´Î¸Ä¶¯Ó°Ïì£¬·½·¨Ç©ÃûÎ´±ä£©¡£
+    /// ã€è¢«åŠ¨æ¥å£ã€‘æŒ‰é’® / æŠ›é”š / æ•æ / æ’ç¤ / çˆ†ç‚¸ / denied / ç¡®è®¤å® / è°ƒé¢‘ / å¬å£° ducking / å­—å¹•é™ç”µ,
+    /// ç”±å„ç³»ç»Ÿä¸€è¡Œè°ƒç”¨ï¼ˆBoatController ç­‰å·²æ¥å¥½çš„è°ƒç”¨ä¸å—æœ¬æ¬¡æ”¹åŠ¨å½±å“ï¼Œæ–¹æ³•ç­¾åæœªå˜ï¼‰ã€‚
     /// </summary>
     public class SoundManager : SingletonBehaviour<SoundManager>
     {
         protected override bool PersistOnLoad => true;
 
         // ==================================================================
-        // Inspector ÒôÆµ²Û£¨Áô¿Õ = »ØÍË Resources/Audio/ Í¬ÃûÎÄ¼ş£©
+        // Inspector éŸ³é¢‘æ§½ï¼ˆç•™ç©º = å›é€€ Resources/Audio/ åŒåæ–‡ä»¶ï¼‰
         // ==================================================================
 
-        [Header("»·¾³Ñ­»·²ã")]
-        [Tooltip("²ÕÄÚµ×ÔëÑ­»·¡£»ØÍËÎÄ¼şÃû: amb_cabin_lp")]
+        [Header("ç¯å¢ƒå¾ªç¯å±‚")]
+        [Tooltip("èˆ±å†…åº•å™ªå¾ªç¯ã€‚å›é€€æ–‡ä»¶å: amb_cabin_lp")]
         [SerializeField] private AudioClip ambCabin;
 
-        [Tooltip("ÒÇ±íµçÁ÷Ñ­»·¡£»ØÍË: amb_electronics_lp")]
+        [Tooltip("ä»ªè¡¨ç”µæµå¾ªç¯ã€‚å›é€€: amb_electronics_lp")]
         [SerializeField] private AudioClip ambElectronics;
 
-        [Tooltip("ÉùÄÅ³ÖĞøÉ¨ÃèÑ­»·¡£»ØÍË: lp_radar_sweep")]
+        [Tooltip("å£°å‘æŒç»­æ‰«æå¾ªç¯ã€‚å›é€€: lp_radar_sweep")]
         [SerializeField] private AudioClip radarSweepLoop;
 
-        [Tooltip("ÒıÇæµ¡ËÙÑ­»·£¨Ëæ´¬ËÙ×Ô¶¯±äµ÷£©¡£»ØÍË: lp_engine_idle")]
+        [Tooltip("å¼•æ“æ€ é€Ÿå¾ªç¯ï¼ˆéšèˆ¹é€Ÿè‡ªåŠ¨å˜è°ƒï¼‰ã€‚å›é€€: lp_engine_idle")]
         [SerializeField] private AudioClip engineIdle;
 
-        [Tooltip("µÍµçÁ¿¸½¼ÓÑ­»·²ã¡£»ØÍË: amb_lowpower_lp")]
+        [Tooltip("ä½ç”µé‡é™„åŠ å¾ªç¯å±‚ã€‚å›é€€: amb_lowpower_lp")]
         [SerializeField] private AudioClip ambLowPower;
 
-        [Tooltip("´¬ÌåËæ»úÉëÒ÷£¨¶à¸ö±äÌåËæ»ú³éÈ¡£©¡£»ØÍË: amb_hull_creak_01~04")]
+        [Tooltip("èˆ¹ä½“éšæœºå‘»åŸï¼ˆå¤šä¸ªå˜ä½“éšæœºæŠ½å–ï¼‰ã€‚å›é€€: amb_hull_creak_01~04")]
         [SerializeField] private AudioClip[] hullCreaks;
 
-        [Tooltip("µçÌ¨µ×Ôë£¨×ÖÄ»¾²µç±¬µã´ÓÖĞËæ»ú½ØÈ¡£©¡£»ØÍË: lp_radio_static")]
+        [Tooltip("ç”µå°åº•å™ªï¼ˆå­—å¹•é™ç”µçˆ†ç‚¹ä»ä¸­éšæœºæˆªå–ï¼‰ã€‚å›é€€: lp_radio_static")]
         [SerializeField] private AudioClip radioStatic;
 
-        [Header("°´Å¥")]
-        [Tooltip("Í¨ÓÃÇá°´£¨UI / ÔİÍ£ / ¿ªÊ¼£©¡£»ØÍË: btn_press_light")]
+        [Header("æŒ‰é’®")]
+        [Tooltip("é€šç”¨è½»æŒ‰ï¼ˆUI / æš‚åœ / å¼€å§‹ï¼‰ã€‚å›é€€: btn_press_light")]
         [SerializeField] private AudioClip btnPressLight;
 
-        [Tooltip("Í¨ÓÃÖØ°´£¨Å×Ãª / ²¶ÀÌ / Í¶µ¯Èı¼ü¹²ÓÃ£¬×Ô¶¯±äµ÷Çø·Ö£©¡£»ØÍË: btn_press_heavy")]
+        [Tooltip("é€šç”¨é‡æŒ‰ï¼ˆæŠ›é”š / æ•æ / æŠ•å¼¹ä¸‰é”®å…±ç”¨ï¼Œè‡ªåŠ¨å˜è°ƒåŒºåˆ†ï¼‰ã€‚å›é€€: btn_press_heavy")]
         [SerializeField] private AudioClip btnPressHeavy;
 
-        [Tooltip("µ÷ÆµĞıÅ¥ßÇßÕ£¨ËæÆµ¶Î×Ô¶¯Î¢±äµ÷£©¡£»ØÍË: btn_freq_tune")]
+        [Tooltip("è°ƒé¢‘æ—‹é’®å’”å“’ï¼ˆéšé¢‘æ®µè‡ªåŠ¨å¾®å˜è°ƒï¼‰ã€‚å›é€€: btn_freq_tune")]
         [SerializeField] private AudioClip btnFreqTune;
 
-        [Tooltip("²Ù×÷±»¾Ü buzz¡£»ØÍË: btn_denied")]
+        [Tooltip("æ“ä½œè¢«æ‹’ buzzã€‚å›é€€: btn_denied")]
         [SerializeField] private AudioClip btnDenied;
 
-        [Tooltip("È·ÈÏ¶££¨Èë²Õµ¥Ïì / Ö÷ÏßË«Ïì£©¡£»ØÍË: ui_ding")]
+        [Tooltip("ç¡®è®¤å®ï¼ˆå…¥èˆ±å•å“ / ä¸»çº¿åŒå“ï¼‰ã€‚å›é€€: ui_ding")]
         [SerializeField] private AudioClip uiDing;
 
-        [Header("Íæ·¨")]
-        [Tooltip("Å×Ãª£ºÈëË® + Á´Ìõ + ´¥µ×¡£»ØÍË: anchor_drop")]
+        [Header("ç©æ³•")]
+        [Tooltip("æŠ›é”šï¼šå…¥æ°´ + é“¾æ¡ + è§¦åº•ã€‚å›é€€: anchor_drop")]
         [SerializeField] private AudioClip anchorDrop;
 
-        [Tooltip("²¶ÀÌ³É¹¦£º½ÊÅÌÖØÔØ³öË®£¨Âä¿ÕÒôÓÉ´ËËØ²Ä×Ô¶¯±äµ÷Éú³É£©¡£»ØÍË: salvage_success")]
+        [Tooltip("æ•ææˆåŠŸï¼šç»ç›˜é‡è½½å‡ºæ°´ï¼ˆè½ç©ºéŸ³ç”±æ­¤ç´ æè‡ªåŠ¨å˜è°ƒç”Ÿæˆï¼‰ã€‚å›é€€: salvage_success")]
         [SerializeField] private AudioClip salvageSuccess;
 
-        [Tooltip("×²°µ½¸¾ŞÏì¡£»ØÍË: evt_reef_impact")]
+        [Tooltip("æ’æš—ç¤å·¨å“ã€‚å›é€€: evt_reef_impact")]
         [SerializeField] private AudioClip reefImpact;
 
-        [Tooltip("ÉîË®Õ¨µ¯±¬Õ¨¡£»ØÍË: evt_depthcharge_explode")]
+        [Tooltip("æ·±æ°´ç‚¸å¼¹çˆ†ç‚¸ã€‚å›é€€: evt_depthcharge_explode")]
         [SerializeField] private AudioClip depthChargeExplode;
 
-        [Tooltip("µÍµçÁ¿±¨¾¯ßÙ£¨µ¥Éù£¬¼ä¸ôÓÉ´úÂë¿ØÖÆ£©¡£»ØÍË: lp_lowpower_warn")]
+        [Tooltip("ä½ç”µé‡æŠ¥è­¦å“”ï¼ˆå•å£°ï¼Œé—´éš”ç”±ä»£ç æ§åˆ¶ï¼‰ã€‚å›é€€: lp_lowpower_warn")]
         [SerializeField] private AudioClip lowPowerWarn;
 
         // ==================================================================
-        // ²ÎÊı
+        // å‚æ•°
         // ==================================================================
 
-        [Header("ÒıÇæ")]
-        [Tooltip("´¬ËÙÂú¸ñÊ±ÒıÇæÑ­»·µÄÒô¸ß£¨+4°ëÒô¡Ö1.26£©")]
+        [Header("å¼•æ“")]
+        [Tooltip("èˆ¹é€Ÿæ»¡æ ¼æ—¶å¼•æ“å¾ªç¯çš„éŸ³é«˜ï¼ˆ+4åŠéŸ³â‰ˆ1.26ï¼‰")]
         [SerializeField] private float enginePitchMax = 1.26f;
 
-        [Header("ÌıÉù Ducking")]
-        [Tooltip("ÌıÉùÆÚ¼ä»·¾³Ñ­»·ÒôÁ¿µÄÑ¹µÍ±¶ÂÊ£¨0~1£©")]
+        [Header("å¬å£° Ducking")]
+        [Tooltip("å¬å£°æœŸé—´ç¯å¢ƒå¾ªç¯éŸ³é‡çš„å‹ä½å€ç‡ï¼ˆ0~1ï¼‰")]
         [SerializeField] private float listenDuckFactor = 0.35f;
 
-        [Tooltip("Ducking ½¥±äÊ±³¤£¨Ãë£©")]
+        [Tooltip("Ducking æ¸å˜æ—¶é•¿ï¼ˆç§’ï¼‰")]
         [SerializeField] private float duckFadeTime = 0.2f;
 
-        [Header("µÍµçÁ¿£¨×Ô¶¯½Ó¹Ü£©")]
-        [Tooltip("´¥·¢µÍµç±¨¾¯µÄµçÁ¿°Ù·Ö±ÈãĞÖµ")]
+        [Header("ä½ç”µé‡ï¼ˆè‡ªåŠ¨æ¥ç®¡ï¼‰")]
+        [Tooltip("è§¦å‘ä½ç”µæŠ¥è­¦çš„ç”µé‡ç™¾åˆ†æ¯”é˜ˆå€¼")]
         [SerializeField] private float lowPowerThreshold = 25f;
 
-        [Tooltip("ãĞÖµ´¦µÄßÙÉù¼ä¸ô£¨Ãë£©")]
+        [Tooltip("é˜ˆå€¼å¤„çš„å“”å£°é—´éš”ï¼ˆç§’ï¼‰")]
         [SerializeField] private float warnIntervalMax = 2.0f;
 
-        [Tooltip("µçÁ¿Ç÷½ü 0 Ê±µÄßÙÉù¼ä¸ô£¨Ãë£©")]
+        [Tooltip("ç”µé‡è¶‹è¿‘ 0 æ—¶çš„å“”å£°é—´éš”ï¼ˆç§’ï¼‰")]
         [SerializeField] private float warnIntervalMin = 0.8f;
 
-        [Header("´¬ÌåÉëÒ÷£¨×Ô¶¯½Ó¹Ü£©")]
-        [Tooltip("Ëæ»úÉëÒ÷µÄ×î¶Ì¼ä¸ô£¨Ãë£©")]
+        [Header("èˆ¹ä½“å‘»åŸï¼ˆè‡ªåŠ¨æ¥ç®¡ï¼‰")]
+        [Tooltip("éšæœºå‘»åŸçš„æœ€çŸ­é—´éš”ï¼ˆç§’ï¼‰")]
         [SerializeField] private float creakIntervalMin = 15f;
 
-        [Tooltip("Ëæ»úÉëÒ÷µÄ×î³¤¼ä¸ô£¨Ãë£©")]
+        [Tooltip("éšæœºå‘»åŸçš„æœ€é•¿é—´éš”ï¼ˆç§’ï¼‰")]
         [SerializeField] private float creakIntervalMax = 40f;
 
-        [Header("À×´ïÉ¨ÃèÒô£¨×Ô¶¯½Ó¹Ü£©")]
-        [Tooltip("À×´ïàÖÉùµÄ²¥·Å¼ä¸ô£¨Ãë£©¡£ÊÓ¾õÉ¨Ãè»·ÊÇ 2 ÃëÒ»È¦£¬ÉùÒô¼ä¸ô¿É¶ÀÁ¢µ÷")]
+        [Header("é›·è¾¾æ‰«æéŸ³ï¼ˆè‡ªåŠ¨æ¥ç®¡ï¼‰")]
+        [Tooltip("é›·è¾¾å˜€å£°çš„æ’­æ”¾é—´éš”ï¼ˆç§’ï¼‰ã€‚è§†è§‰æ‰«æç¯æ˜¯ 2 ç§’ä¸€åœˆï¼Œå£°éŸ³é—´éš”å¯ç‹¬ç«‹è°ƒ")]
         [SerializeField] private float radarInterval = 3f;
 
-        [Tooltip("À×´ïàÖÉùÒôÁ¿")]
+        [Tooltip("é›·è¾¾å˜€å£°éŸ³é‡")]
         [SerializeField] private float radarVolume = 0.25f;
 
-        // ===== ÄÚ²¿ =====
+        // ===== å†…éƒ¨ =====
 
         private class LoopEntry
         {
@@ -141,7 +141,7 @@ namespace GameJam2026
         private bool _ambienceOn;
 
         // ==================================================================
-        // ×Ô¶¯½Ó¹Ü£º¶©ÔÄ / ÂÖÑ¯
+        // è‡ªåŠ¨æ¥ç®¡ï¼šè®¢é˜… / è½®è¯¢
         // ==================================================================
 
         private void OnEnable() => SafeSubscribe();
@@ -192,7 +192,7 @@ namespace GameJam2026
                 case GameManager.GameState.GameOver:
                     StopAmbience();
                     break;
-                    // Paused / LevelSettled£º»·¾³±£³Ö
+                    // Paused / LevelSettledï¼šç¯å¢ƒä¿æŒ
             }
         }
 
@@ -217,10 +217,10 @@ namespace GameJam2026
             StopAllLoops(1f);
         }
 
-        /// <summary>À×´ïàÖÉù£ºÃ¿ radarInterval Ãë²¥Ò»´Î£¨ÊÜÌıÉù ducking Ó°ÏìµÄ»°¿É×ÔĞĞ¼Ó _duck ÏµÊı£©¡£</summary>
+        /// <summary>é›·è¾¾å˜€å£°ï¼šæ¯ radarInterval ç§’æ’­ä¸€æ¬¡ï¼ˆå—å¬å£° ducking å½±å“çš„è¯å¯è‡ªè¡ŒåŠ  _duck ç³»æ•°ï¼‰ã€‚</summary>
         private IEnumerator RadarTicks()
         {
-            yield return new WaitForSeconds(2.4f);   // Óë»·¾³²ãµ­Èë´í¿ª
+            yield return new WaitForSeconds(2.4f);   // ä¸ç¯å¢ƒå±‚æ·¡å…¥é”™å¼€
             while (true)
             {
                 if (_ambienceOn)
@@ -286,7 +286,7 @@ namespace GameJam2026
             }
         }
 
-        /// <summary>È¡Ò»Ìõ´¬ÌåÉëÒ÷£ºInspector Êı×éÓĞÄÚÈİÔòËæ»ú³éÈ¡£¬·ñÔò»ØÍË Resources µÄ 01~04¡£</summary>
+        /// <summary>å–ä¸€æ¡èˆ¹ä½“å‘»åŸï¼šInspector æ•°ç»„æœ‰å†…å®¹åˆ™éšæœºæŠ½å–ï¼Œå¦åˆ™å›é€€ Resources çš„ 01~04ã€‚</summary>
         private AudioClip PickCreak()
         {
             if (hullCreaks != null && hullCreaks.Length > 0)
@@ -299,33 +299,33 @@ namespace GameJam2026
         }
 
         // ==================================================================
-        // ±»¶¯½Ó¿Ú£ºÓÎÏ·ĞÔÒôĞ§£¨·½·¨Ç©ÃûÓë¾É°æÒ»ÖÂ£¬µ÷ÓÃ·½ÎŞĞè¸Ä¶¯£©
+        // è¢«åŠ¨æ¥å£ï¼šæ¸¸æˆæ€§éŸ³æ•ˆï¼ˆæ–¹æ³•ç­¾åä¸æ—§ç‰ˆä¸€è‡´ï¼Œè°ƒç”¨æ–¹æ— éœ€æ”¹åŠ¨ï¼‰
         // ==================================================================
 
-        /// <summary>°ëÒô×ª pitch£¨+n °ëÒô = Pow(2, n/12)£©¡£</summary>
+        /// <summary>åŠéŸ³è½¬ pitchï¼ˆ+n åŠéŸ³ = Pow(2, n/12)ï¼‰ã€‚</summary>
         public static float Semitone(float n) => Mathf.Pow(2f, n / 12f);
 
-        // ---- Èı´óÖØĞÍ°´Å¥¹²ÓÃÖØ°´ËØ²Ä±äµ÷ ----
+        // ---- ä¸‰å¤§é‡å‹æŒ‰é’®å…±ç”¨é‡æŒ‰ç´ æå˜è°ƒ ----
         public void PlayAnchorButton() => PlayClip(Clip(btnPressHeavy, "btn_press_heavy"), 1f, Semitone(-1)); // BoatController.BeginAnchor
         public void PlaySalvageButton() => PlayClip(Clip(btnPressHeavy, "btn_press_heavy"), 1f, Semitone(0));  // BoatController.Salvage
         public void PlayDepthChargeButton() => PlayClip(Clip(btnPressHeavy, "btn_press_heavy"), 1f, Semitone(1));  // DepthChargeLauncher.Drop
 
-        /// <summary>Í¨ÓÃÇá°´¡£UI °´Å¥ / ÔİÍ£ / ¿ªÊ¼ÓÃ¡£</summary>
+        /// <summary>é€šç”¨è½»æŒ‰ã€‚UI æŒ‰é’® / æš‚åœ / å¼€å§‹ç”¨ã€‚</summary>
         public void PlayLightButton() => PlayClip(Clip(btnPressLight, "btn_press_light"));
 
-        /// <summary>µ÷ÆµßÇßÕ¡£SonarSystem.HandleBandSwitch µ÷ÓÃ£¬´« (int)currentBand£¨0/1/2£©¡£</summary>
+        /// <summary>è°ƒé¢‘å’”å“’ã€‚SonarSystem.HandleBandSwitch è°ƒç”¨ï¼Œä¼  (int)currentBandï¼ˆ0/1/2ï¼‰ã€‚</summary>
         public void PlayFreqTune(int band) => PlayClip(Clip(btnFreqTune, "btn_freq_tune"), 1f, Semitone(band - 1));
 
-        /// <summary>²Ù×÷±»¾Ü buzz¡£µ¯Ò©ºÄ¾¡ / »õ²ÕÂú / µçÁ¿²»×ã¡£</summary>
+        /// <summary>æ“ä½œè¢«æ‹’ buzzã€‚å¼¹è¯è€—å°½ / è´§èˆ±æ»¡ / ç”µé‡ä¸è¶³ã€‚</summary>
         public void PlayDenied() => PlayClip(Clip(btnDenied, "btn_denied"));
 
-        /// <summary>À×´ïµ¥´Î blip£¨¿ÉÑ¡£¬É¨ÃèÑ­»·ÒÑ³£×¤£©¡£¸´ÓÃÇá°´ËØ²Ä¼«Çá¸ßµ÷¡£</summary>
+        /// <summary>é›·è¾¾å•æ¬¡ blipï¼ˆå¯é€‰ï¼Œæ‰«æå¾ªç¯å·²å¸¸é©»ï¼‰ã€‚å¤ç”¨è½»æŒ‰ç´ ææè½»é«˜è°ƒã€‚</summary>
         public void PlayRadarBlip() => PlayClip(Clip(btnPressLight, "btn_press_light"), 0.15f, Semitone(7));
 
-        /// <summary>Å×ÃªÒô¡£BoatController.BeginAnchor µ÷ÓÃ¡£</summary>
+        /// <summary>æŠ›é”šéŸ³ã€‚BoatController.BeginAnchor è°ƒç”¨ã€‚</summary>
         public void PlayAnchorDrop() => PlayClip(Clip(anchorDrop, "anchor_drop"));
 
-        /// <summary>²¶ÀÌ½á¹û¡£³É¹¦=Ô­ËØ²Ä£»Âä¿Õ=Í¬ËØ²ÄÉı 2 °ëÒô½ØÇ°¶Î£¬²»ĞèÒªµ¥¶ÀÎÄ¼ş¡£</summary>
+        /// <summary>æ•æç»“æœã€‚æˆåŠŸ=åŸç´ æï¼›è½ç©º=åŒç´ æå‡ 2 åŠéŸ³æˆªå‰æ®µï¼Œä¸éœ€è¦å•ç‹¬æ–‡ä»¶ã€‚</summary>
         public void PlaySalvageResult(bool success)
         {
             AudioClip clip = Clip(salvageSuccess, "salvage_success");
@@ -340,13 +340,13 @@ namespace GameJam2026
             StartCoroutine(FadeOutAndKill(src, 0.3f, delay: clip.length * 0.45f));
         }
 
-        /// <summary>×²°µ½¸¾ŞÏì¡£BoatController.OnTriggerEnter2D µ÷ÓÃ¡£</summary>
+        /// <summary>æ’æš—ç¤å·¨å“ã€‚BoatController.OnTriggerEnter2D è°ƒç”¨ã€‚</summary>
         public void PlayReefImpact() => PlayClip(Clip(reefImpact, "evt_reef_impact"));
 
-        /// <summary>Éîµ¯±¬Õ¨¡£DepthChargeLauncher.Detonate µ÷ÓÃ¡£</summary>
+        /// <summary>æ·±å¼¹çˆ†ç‚¸ã€‚DepthChargeLauncher.Detonate è°ƒç”¨ã€‚</summary>
         public void PlayExplosion() => PlayClip(Clip(depthChargeExplode, "evt_depthcharge_explode"));
 
-        /// <summary>È·ÈÏ¶£¡£Èë²Õµ¥Ïì£»Ö÷ÏßÄ¿±ê´« true Ë«Ïì£¨Ô­µ÷ + Éı 4 °ëÒô£©¡£</summary>
+        /// <summary>ç¡®è®¤å®ã€‚å…¥èˆ±å•å“ï¼›ä¸»çº¿ç›®æ ‡ä¼  true åŒå“ï¼ˆåŸè°ƒ + å‡ 4 åŠéŸ³ï¼‰ã€‚</summary>
         public void PlayConfirm(bool isMainQuest = false)
         {
             AudioClip clip = Clip(uiDing, "ui_ding");
@@ -355,7 +355,7 @@ namespace GameJam2026
                 StartCoroutine(Delayed(0.25f, () => PlayClip(clip, 1f, Semitone(4))));
         }
 
-        /// <summary>µçÌ¨¾²µç±¬µã£º´ÓµçÌ¨µ×ÔëËæ»ú½Ø 0.4 Ãë¡£SubtitleManager.Show µ÷ÓÃ£»¾çÇé¹ÊÕÏ´« true ¸üÏì¡£</summary>
+        /// <summary>ç”µå°é™ç”µçˆ†ç‚¹ï¼šä»ç”µå°åº•å™ªéšæœºæˆª 0.4 ç§’ã€‚SubtitleManager.Show è°ƒç”¨ï¼›å‰§æƒ…æ•…éšœä¼  true æ›´å“ã€‚</summary>
         public void PlayRadioBurst(bool isGlitch = false)
         {
             AudioClip clip = Clip(radioStatic, "lp_radio_static");
@@ -368,7 +368,7 @@ namespace GameJam2026
             StartCoroutine(FadeOutAndKill(src, 0.1f, delay: 0.35f));
         }
 
-        /// <summary>ÌıÉù ducking¡£SonarSystem.Ping ¿ªÍ· true£¬Ô¼ 5 Ãëºó false¡£Ö»Ñ¹»·¾³Ñ­»·²ã¡£</summary>
+        /// <summary>å¬å£° duckingã€‚SonarSystem.Ping å¼€å¤´ trueï¼Œçº¦ 5 ç§’å falseã€‚åªå‹ç¯å¢ƒå¾ªç¯å±‚ã€‚</summary>
         public void SetListenDuck(bool on)
         {
             if (_duckRoutine != null) StopCoroutine(_duckRoutine);
@@ -376,10 +376,10 @@ namespace GameJam2026
         }
 
         // ==================================================================
-        // »ù´¡²¥·Å
+        // åŸºç¡€æ’­æ”¾
         // ==================================================================
 
-        /// <summary>²¥·ÅÈÎÒâ¼ô¼­£¨Ò»´ÎĞÔ£©¡£¸øÁÙÊ±ĞèÇó / Íâ²¿¼ô¼­ÓÃ¡£</summary>
+        /// <summary>æ’­æ”¾ä»»æ„å‰ªè¾‘ï¼ˆä¸€æ¬¡æ€§ï¼‰ã€‚ç»™ä¸´æ—¶éœ€æ±‚ / å¤–éƒ¨å‰ªè¾‘ç”¨ã€‚</summary>
         public void PlayClip(AudioClip clip, float volume = 1f, float pitch = 1f, float pan = 0f)
         {
             if (clip == null) return;
@@ -392,7 +392,7 @@ namespace GameJam2026
             Destroy(src.gameObject, clip.length / src.pitch + 0.1f);
         }
 
-        /// <summary>Æô¶¯Ñ­»·²ã£¨key Î¨Ò»£©¡£isAmbient=true µÄ²ã²ÎÓëÌıÉù ducking¡£</summary>
+        /// <summary>å¯åŠ¨å¾ªç¯å±‚ï¼ˆkey å”¯ä¸€ï¼‰ã€‚isAmbient=true çš„å±‚å‚ä¸å¬å£° duckingã€‚</summary>
         public void StartLoop(string key, AudioClip clip, float volume = 1f, float fadeIn = 0.5f, bool isAmbient = true)
         {
             if (clip == null || _loops.ContainsKey(key)) return;
@@ -424,10 +424,10 @@ namespace GameJam2026
         }
 
         // ==================================================================
-        // ÄÚ²¿¹¤¾ß
+        // å†…éƒ¨å·¥å…·
         // ==================================================================
 
-        /// <summary>È¡¼ô¼­£ºInspector ÍÏÈëµÄÓÅÏÈ£»Áô¿Õ»ØÍË Resources/Audio/<fallbackName>£»¶¼Ã»ÓĞ´ò Warning¡£</summary>
+        /// <summary>å–å‰ªè¾‘ï¼šInspector æ‹–å…¥çš„ä¼˜å…ˆï¼›ç•™ç©ºå›é€€ Resources/Audio/<fallbackName>ï¼›éƒ½æ²¡æœ‰æ‰“ Warningã€‚</summary>
         private AudioClip Clip(AudioClip inspectorClip, string fallbackName)
         {
             if (inspectorClip != null) return inspectorClip;
@@ -435,7 +435,7 @@ namespace GameJam2026
             if (_resourceCache.TryGetValue(fallbackName, out AudioClip cached)) return cached;
             AudioClip clip = Resources.Load<AudioClip>("Audio/" + fallbackName);
             if (clip == null)
-                Debug.LogWarning($"[Sound] ÒôÆµÈ±Ê§: Inspector Î´ÍÏÈëÇÒ Resources/Audio/{fallbackName} ²»´æÔÚ£¨ÒÑÌø¹ı£©");
+                Debug.LogWarning($"[Sound] éŸ³é¢‘ç¼ºå¤±: Inspector æœªæ‹–å…¥ä¸” Resources/Audio/{fallbackName} ä¸å­˜åœ¨ï¼ˆå·²è·³è¿‡ï¼‰");
             _resourceCache[fallbackName] = clip;
             return clip;
         }
@@ -446,7 +446,7 @@ namespace GameJam2026
             go.transform.SetParent(transform);
             var src = go.AddComponent<AudioSource>();
             src.playOnAwake = false;
-            src.spatialBlend = 0f;   // È« 2D£»3D ¶ÔÏóÒôÓÉ SonarTarget ¸ºÔğ
+            src.spatialBlend = 0f;   // å…¨ 2Dï¼›3D å¯¹è±¡éŸ³ç”± SonarTarget è´Ÿè´£
             return src;
         }
 

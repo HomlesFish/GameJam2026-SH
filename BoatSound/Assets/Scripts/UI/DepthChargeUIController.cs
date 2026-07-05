@@ -15,11 +15,7 @@ namespace GameJam2026
         [Tooltip("弹药图标格，按「先点亮 → 后点亮」顺序拖入（满弹时全亮，用一枚灭最后一格）")]
         [SerializeField] private GameObject[] cells = new GameObject[3];
 
-        private void OnEnable()
-        {
-            if (DepthChargeLauncher.Instance != null)
-                DepthChargeLauncher.Instance.OnChargesChanged += HandleChargesChanged;
-        }
+        private void OnEnable() => SafeSubscribe();
 
         private void OnDisable()
         {
@@ -29,9 +25,18 @@ namespace GameJam2026
 
         private void Start()
         {
-            // 解决跨对象初始化顺序：DepthChargeLauncher 在 Awake 已设好初值，这里立即刷新一次
-            if (DepthChargeLauncher.Instance != null)
-                HandleChargesChanged(DepthChargeLauncher.Instance.Charges, DepthChargeLauncher.Instance.MaxCharges);
+            // Start 时所有 Awake 已跑完：补订阅一次（防 OnEnable 早于 DepthChargeLauncher.Awake 漏订）
+            SafeSubscribe();
+        }
+
+        /// <summary>幂等订阅 OnChargesChanged（重复调用不会多次订阅）。
+        /// 订阅只接收"之后"的变化，故每次成功订阅时顺带刷新当前弹药显示。</summary>
+        private void SafeSubscribe()
+        {
+            if (DepthChargeLauncher.Instance == null) return;
+            DepthChargeLauncher.Instance.OnChargesChanged -= HandleChargesChanged;
+            DepthChargeLauncher.Instance.OnChargesChanged += HandleChargesChanged;
+            HandleChargesChanged(DepthChargeLauncher.Instance.Charges, DepthChargeLauncher.Instance.MaxCharges);
         }
 
         private void HandleChargesChanged(int current, int max)

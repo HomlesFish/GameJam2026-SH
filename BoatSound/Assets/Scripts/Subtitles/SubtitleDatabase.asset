@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f85dcf0077142e3a401c0dab54eda6c, type: 3}
   m_Name: SubtitleDatabase
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   entries:
   - id: 1001
     text: 123456
@@ -19,27 +19,120 @@ MonoBehaviour:
   - id: HarborNoObjective
     text: 未获得主要物品，无法进行结算
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: NearTarget
+    text: 已在目标附近
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: HitReef
+    text: 你已触礁
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: DepthChargeLaunched
+    text: 成功发射
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: Anchored
+    text: 船锚到达海底
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: BombedFish
+    text: 已炸到鱼群
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: BombedReef
+    text: 已炸到暗礁
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: L1_01
+    text: "故障——电台突然播放无关片段"
     voice: {fileID: 0}
-  - id: 
-    text: 
+  - id: L1_02
+    text: "【女声（年轻，带笑）：“铭牌上刻了字？......我看看......'愿你找到归路'......你写的？”】"
+    voice: {fileID: 0}
+  - id: L1_03
+    text: "刺啦的电流声响过，电台切回正常："
+    voice: {fileID: 0}
+  - id: L1_04
+    text: "船长：“这是一个铭牌吊坠。有点旧了。”"
+    voice: {fileID: 0}
+  - id: L1_05
+    text: "船长：“铭牌底部刻着字：“给J，愿你找到归路。——L””"
+    voice: {fileID: 0}
+  - id: L1_06
+    text: "船长：“这是一个不锈钢质地的铭牌。看起来没什么价值。”"
+    voice: {fileID: 0}
+  - id: L2_01
+    text: "故障——电台突然播放无关片段"
+    voice: {fileID: 0}
+  - id: L2_02
+    text: "【（——一段嘈杂的背景环境音。紧接着响起了一段对话。）】"
+    voice: {fileID: 0}
+  - id: L2_03
+    text: "A：“……这里太靠近核心了，核辐射的影响越来越严重了。上头的撤离令下来了……”"
+    voice: {fileID: 0}
+  - id: L2_04
+    text: "B：“林副队长呢？”"
+    voice: {fileID: 0}
+  - id: L2_05
+    text: "A：“他不走，他说要等婕回来。”"
+    voice: {fileID: 0}
+  - id: L2_06
+    text: "B：“她下潜的太深了......”"
+    voice: {fileID: 0}
+  - id: L2_07
+    text: "（录音筒响起了和船长声音一致的男声，但不同之处是，这个声音听起来异常疲惫。）"
+    voice: {fileID: 0}
+  - id: L2_08
+    text: "“我是林。这是第23日。今天辐射量总量约为110 µSv。”"
+    voice: {fileID: 0}
+  - id: L2_09
+    text: "“我能感觉到，我已经受辐射影响，忘记了上周发生的事。再这么下去，我还会忘记多少事？”"
+    voice: {fileID: 0}
+  - id: L2_10
+    text: "“但我至少还记得她。”"
+    voice: {fileID: 0}
+  - id: L2_11
+    text: "船长：“听起来有些悲伤。”"
+    voice: {fileID: 0}
+  - id: L3_01
+    text: "船长：“这是一张防水的纸。上面的字迹还依稀可以辨认，写着——”"
+    voice: {fileID: 0}
+  - id: L3_02
+    text: "'2030年7月4日。下潜深度为327米。辐射量无法测量。'"
+    voice: {fileID: 0}
+  - id: L3_03
+    text: "'我终于看到了核反应堆，还有旁边的核潜艇残骸……这里的种种迹象都符合于旧世纪末期的……“海渊计划”……算是终于有结果了。'"
+    voice: {fileID: 0}
+  - id: L3_04
+    text: "'若我迷失，勿寻。我已决定把生命献给人民。'"
+    voice: {fileID: 0}
+  - id: L3_05
+    text: "署名是婕。看起来是一个女性的名字。"
+    voice: {fileID: 0}
+  - id: L3_06
+    text: "船长：“海底很危险，从理性的角度看，她不应该下潜的。”"
+    voice: {fileID: 0}
+  - id: L4_01
+    text: "（金属筒响起了和船长声音一致的男声）"
+    voice: {fileID: 0}
+  - id: L4_02
+    text: "“我是林。这是第47日。今天辐射量总量约为107 µSv。”"
+    voice: {fileID: 0}
+  - id: L4_03
+    text: "“我已经不记得昨天发生的事。并且，我的长期记忆也在慢慢消失。她到底是谁？”"
+    voice: {fileID: 0}
+  - id: L4_04
+    text: "“明早又有一批撤离船，但我不走。我要留在这里。那个声音还在我的耳边，在喊我的名字。”"
+    voice: {fileID: 0}
+  - id: L4_05
+    text: "“我要去找她。”"
+    voice: {fileID: 0}
+  - id: L4_06
+    text: "船长：“我意识到这个语音和我的音频素材高度相似。”"
+    voice: {fileID: 0}
+  - id: L5_01
+    text: "（录音筒响起了和船长声音一致的男声）"
+    voice: {fileID: 0}
+  - id: L5_02
+    text: "“我开始连我自己是谁都逐渐忘记了。”"
+    voice: {fileID: 0}
+  - id: L5_03
+    text: "“还好这艘船配备了智能系统，我可以把我自己的录音接入系统，用来提醒未来的我——该怎么打捞，怎么继续在这片海上生存。”"
+    voice: {fileID: 0}
+  - id: L5_04
+    text: "“无论如何，我也不能放弃寻找那个声音。她很重要。”"
     voice: {fileID: 0}

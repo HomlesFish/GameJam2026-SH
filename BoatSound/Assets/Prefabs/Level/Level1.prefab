@@ -437,10 +437,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: StartPort
       objectReference: {fileID: 0}
-    - target: {fileID: 3078799200463196932, guid: 6db6d0545573a924892fd74e551431ec, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6674357275472813455, guid: 6db6d0545573a924892fd74e551431ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.1800008

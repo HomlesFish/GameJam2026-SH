@@ -41,6 +41,10 @@ namespace GameJam2026
         [Tooltip("玩家船。不填则 Awake 自动查找场景里的 BoatController")]
         [SerializeField] private BoatController boat;
 
+        [Header("剧情字幕")]
+        [Tooltip("每关「打捞主线目标」后顺序播放的剧情字幕。索引 = 关卡号（与 levels 对齐）；某关留空则回退到内置默认 id 表（LevelStoryDefaults）。")]
+        [SerializeField] private LevelStorySubtitles[] perLevelStorySubtitles;
+
         /// <summary>玩家船（全局唯一真相源；各系统统一从此取，不再各自持有/查找）。</summary>
         public BoatController Boat { get; private set; }
 
@@ -52,6 +56,19 @@ namespace GameJam2026
 
         /// <summary>跨关卡累计总分（每关结算时累加当关货舱分）。</summary>
         public int TotalScore { get; private set; }
+
+        /// <summary>取第 <paramref name="levelIndex"/> 关「打捞主线目标」后要顺序播放的剧情字幕 id。
+        /// 若 <see cref="perLevelStorySubtitles"/> 该关已配置且非空则用它，否则回退到内置默认 id 表（<see cref="LevelStoryDefaults"/>）；越界 / 未配置返回 null。</summary>
+        public string[] GetLevelStorySubtitleIds(int levelIndex)
+        {
+            if (perLevelStorySubtitles != null && levelIndex >= 0 && levelIndex < perLevelStorySubtitles.Length)
+            {
+                LevelStorySubtitles entry = perLevelStorySubtitles[levelIndex];
+                if (entry != null && entry.ids != null && entry.ids.Length > 0)
+                    return entry.ids;
+            }
+            return LevelStoryDefaults.Get(levelIndex);
+        }
 
         /// <summary>状态变化事件。其他系统订阅即可联动。参数：(新状态, 旧状态)</summary>
         public event Action<GameState, GameState> OnStateChanged;
@@ -113,6 +130,9 @@ namespace GameJam2026
             LevelData data = levels[index];
 
             ClearCurrentLevel();
+
+            // 换关：打断上一关尚未播完的剧情字幕序列，避免跨关叠加
+            if (SubtitleManager.Instance != null) SubtitleManager.Instance.StopSequence();
 
             if (data.LevelPrefab == null)
             {
@@ -241,5 +261,31 @@ namespace GameJam2026
             T[] arr = FindObjectsByType<T>(FindObjectsSortMode.None);
             return (arr != null && arr.Length > 0) ? arr[0] : null;
         }
+    }
+
+    /// <summary>单关「打捞主线目标」剧情字幕 id 列表（包装数组，便于在 GameManager Inspector 里按关配置）。</summary>
+    [Serializable]
+    public class LevelStorySubtitles
+    {
+        [Tooltip("本关打捞主线目标后，按顺序逐句播放的剧情字幕 id。需在 SubtitleDatabase 建同名条目；留空则回退默认 id 表。")]
+        public string[] ids;
+    }
+
+    /// <summary>每关剧情字幕 id 的内置默认表（索引 = 关卡号），免去 Inspector 手填；GameManager 未配置某关时回退到此。</summary>
+    public static class LevelStoryDefaults
+    {
+        /// <summary>默认剧情字幕 id 表：Table[关卡号] = 该关按顺序逐句播放的 id 数组（对应 SubtitleDatabase 里 L*_** 条目）。</summary>
+        public static readonly string[][] Table =
+        {
+            new[] { "L1_01", "L1_02", "L1_03", "L1_04", "L1_05", "L1_06" },                                                                  // 关卡1：铭牌吊坠
+            new[] { "L2_01", "L2_02", "L2_03", "L2_04", "L2_05", "L2_06", "L2_07", "L2_08", "L2_09", "L2_10", "L2_11" },                       // 关卡2：林的第23日
+            new[] { "L3_01", "L3_02", "L3_03", "L3_04", "L3_05", "L3_06" },                                                                  // 关卡3：婕的防水纸
+            new[] { "L4_01", "L4_02", "L4_03", "L4_04", "L4_05", "L4_06" },                                                                  // 关卡4：林的第47日
+            new[] { "L5_01", "L5_02", "L5_03", "L5_04" },                                                                                    // 关卡5：林的最终独白
+        };
+
+        /// <summary>取第 <paramref name="levelIndex"/> 关的默认剧情 id；越界返回 null。</summary>
+        public static string[] Get(int levelIndex)
+            => (levelIndex >= 0 && levelIndex < Table.Length) ? Table[levelIndex] : null;
     }
 }

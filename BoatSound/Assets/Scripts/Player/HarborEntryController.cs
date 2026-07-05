@@ -169,7 +169,12 @@ namespace GameJam2026
 
             // 表现：船进入港口（传送到港口点）
             if (moveBoatToHarborOnEntry && _boatTransform != null)
+            {
                 _boatTransform.position = harborAnchor.position;
+                // 清零运动状态：否则入港前残留的 currentSpeed 会在下一帧把船推出港口，
+                // 看起来像「没传送到 endport / 刚到又跑掉了」。
+                if (boat != null) boat.ResetMotion();
+            }
 
             // 流程：累计本关分 + 进入 LevelSettled（由 GameManager 编排；本脚本不再算分/清舱/EndGame）
             if (GameManager.Instance != null) GameManager.Instance.SettleCurrentLevel();

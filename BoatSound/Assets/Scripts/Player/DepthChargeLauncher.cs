@@ -57,6 +57,11 @@ namespace GameJam2026
 
         private Material _lineMat; // 程序化线材质（爆炸环复用，缓存避免每帧分配）
 
+        // 字幕 id（需在 SubtitleDatabase 里建同名条目）
+        private const string SubtitleLaunched = "DepthChargeLaunched";
+        private const string SubtitleBombedFish = "BombedFish";
+        private const string SubtitleBombedReef = "BombedReef";
+
         protected override void Awake()
         {
             base.Awake();   // 完成单例注册（必须调用）
@@ -110,6 +115,8 @@ namespace GameJam2026
 
             Charges--;
             FireChanged();
+            // 发射成功字幕提示
+            if (SubtitleManager.Instance != null) SubtitleManager.Instance.Show(SubtitleLaunched);
             Detonate();
         }
 
@@ -120,6 +127,9 @@ namespace GameJam2026
             float sqrRadius = explosionRadius * explosionRadius;
 
             // FindObjectsByType 返回快照数组，遍历中销毁安全
+            bool hitFish = false;
+            bool hitReef = false;
+
             SonarTarget[] targets = FindObjectsByType<SonarTarget>(FindObjectsSortMode.None);
             foreach (SonarTarget t in targets)
             {
@@ -130,8 +140,18 @@ namespace GameJam2026
                 float sqrDist = ((Vector2)t.transform.position - center).sqrMagnitude;
                 if (sqrDist <= sqrRadius)
                 {
+                    // 记录炸到的类型（用 Tag 区分），用于字幕提示
+                    if (t.tag == "Fish") hitFish = true;
+                    else if (t.tag == "Reef") hitReef = true;
                     Destroy(t.gameObject);
                 }
+            }
+
+            // 炸到鱼 / 暗礁的字幕提示（每种每次爆炸最多各一次）
+            if (SubtitleManager.Instance != null)
+            {
+                if (hitFish) SubtitleManager.Instance.Show(SubtitleBombedFish);
+                if (hitReef) SubtitleManager.Instance.Show(SubtitleBombedReef);
             }
 
             PlayExplosionSound();

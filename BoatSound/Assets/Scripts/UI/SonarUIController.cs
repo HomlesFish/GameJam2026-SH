@@ -58,11 +58,7 @@ namespace GameJam2026
 
         private void OnEnable()
         {
-            if (SalvageInventory.Instance != null)
-            {
-                SalvageInventory.Instance.OnChanged += Rebuild;
-                SalvageInventory.Instance.OnChanged += RefreshObjectiveState;
-            }
+            SafeSubscribeInventory();
             SafeSubscribeGameState();
             EventBus.Subscribe(GameEvents.LevelStarted, this);
         }
@@ -93,7 +89,8 @@ namespace GameJam2026
 
         private void Start()
         {
-            // Start 时所有 Awake 已跑完：补订阅 GameManager（防 OnEnable 早于 GameManager.Awake 漏订）
+            // Start 时所有 Awake 已跑完：补订阅各 Manager（防 OnEnable 早于对应 Awake 漏订）
+            SafeSubscribeInventory();
             SafeSubscribeGameState();
             // 解析本关主线目标 → 图标/音效（每关不同，从场景里的 isObjective SonarTarget 读取）
             ResolveObjective();
@@ -103,6 +100,16 @@ namespace GameJam2026
 
             if (_objectiveReady && objectiveIcon != null && checkmarkSprite == null)
                 Debug.LogWarning("[SonarUIController] 未配置 checkmarkSprite：获得目标物品后将无法显示「√」。", this);
+        }
+
+        /// <summary>幂等订阅 SalvageInventory.OnChanged（重复调用不会多次订阅）。</summary>
+        private void SafeSubscribeInventory()
+        {
+            if (SalvageInventory.Instance == null) return;
+            SalvageInventory.Instance.OnChanged -= Rebuild;
+            SalvageInventory.Instance.OnChanged += Rebuild;
+            SalvageInventory.Instance.OnChanged -= RefreshObjectiveState;
+            SalvageInventory.Instance.OnChanged += RefreshObjectiveState;
         }
 
         /// <summary>幂等订阅 GameManager.OnStateChanged（重复调用不会多次订阅）。</summary>

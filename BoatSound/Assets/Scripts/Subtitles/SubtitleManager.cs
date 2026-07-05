@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameJam2026
@@ -67,6 +68,7 @@ namespace GameJam2026
 
         private AudioSource _voice;
         private int _instanceCounter;
+        private Coroutine _sequenceCoroutine;   // 当前顺序播放的剧情序列（同时只允许一个）
 
         protected override void Awake()
         {
@@ -135,6 +137,78 @@ namespace GameJam2026
             OnShown?.Invoke(sub);
             StartCoroutine(HideAfter(sub, displayTime + Mathf.Max(0f, hideDelay)));
             return sub;
+        }
+
+        /// <summary>顺序播放一组字幕（剧情用）：逐条显示，每条到点消失后才出下一条。
+        /// 新调用会中断正在播放的序列；voice 仍走单一声道、逐条衔接。返回是否成功启动。</summary>
+        public bool ShowSequence(IList<string> ids)
+        {
+            if (!isActiveAndEnabled) return false;
+            if (database == null)
+            {
+                Debug.LogWarning("[SubtitleManager] database 未配置，忽略 ShowSequence 调用。", this);
+                return false;
+            }
+            if (ids == null || ids.Count == 0) return false;
+
+            StopSequence();   // 中断正在播放的序列，避免两段剧情叠加
+            _sequenceCoroutine = StartCoroutine(SequenceRoutine(ids));
+            return true;
+        }
+
+        /// <summary>停止当前顺序播放的剧情序列（单条 <see cref="Show"/> 的字幕不受影响，各自独立计时到点消失）。</summary>
+        public void StopSequence()
+        {
+            if (_sequenceCoroutine != null)
+            {
+                StopCoroutine(_sequenceCoroutine);
+                _sequenceCoroutine = null;
+            }
+        }
+
+        /// <summary>逐条播放：每条查库→配音→OnShown，等待 displayTime+hideDelay 后 OnHidden，再进下一条。</summary>
+        private IEnumerator SequenceRoutine(IList<string> ids)
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                string id = ids[i];
+                if (string.IsNullOrEmpty(id)) continue;
+
+                SubtitleEntry entry = database.Find(id);
+                if (entry == null)
+                {
+                    Debug.LogWarning($"[SubtitleManager] 序列找不到字幕 id '{id}'，跳过。", this);
+                    continue;
+                }
+
+                var sub = new ActiveSubtitle
+                {
+                    InstanceId = ++_instanceCounter,
+                    SubtitleId = entry.Id,
+                    Text = entry.Text,
+                    Voice = entry.Voice,
+                };
+
+                float displayTime;
+                if (entry.Voice != null)
+                {
+                    if (_voice != null)
+                    {
+                        _voice.clip = entry.Voice;   // 单声道：新配音覆盖上一条
+                        _voice.Play();
+                    }
+                    displayTime = entry.Voice.length;
+                }
+                else
+                {
+                    displayTime = EstimateDisplayTime(entry.Text);
+                }
+
+                OnShown?.Invoke(sub);
+                yield return new WaitForSeconds(displayTime + Mathf.Max(0f, hideDelay));
+                OnHidden?.Invoke(sub);
+            }
+            _sequenceCoroutine = null;
         }
 
         /// <summary>等待 delay 秒后触发 OnHidden（每条字幕各自独立计时）。</summary>

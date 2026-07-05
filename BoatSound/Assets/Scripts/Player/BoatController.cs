@@ -63,6 +63,10 @@ namespace GameJam2026
         // 暗礁碰撞免疫冷却
         private float _reefCooldown;
 
+        // 字幕 id（需在 SubtitleDatabase 里建同名条目）
+        private const string SubtitleHitReef = "HitReef";
+        private const string SubtitleAnchored = "Anchored";
+
         private void Awake()
         {
             // 以对象当前朝向作为初始 heading，避免与编辑器里设置的旋转冲突
@@ -71,9 +75,11 @@ namespace GameJam2026
 
         private void Update()
         {
-            // 暂停期间冻结操控（ESC 暂停菜单）。timeScale=0 已令 dt=0，此处额外 return
-            // 是为了避免玩家在暂停时按 Space 触发 BeginAnchor 等输入副作用。
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.Paused)
+            // 仅在关卡进行中响应输入与移动：暂停 / 单关结算 / 全通关 / 主菜单期间一律冻结。
+            // 否则结算确认把船传送到 endport 后，残留的 currentSpeed 会在下一帧把船推出港口
+            // （LevelSettled 时 timeScale 仍为 1，Update 照跑），看起来像「没到 endport / 又跑掉了」。
+            // 额外 return 也避免暂停时按 Space 触发 BeginAnchor 等输入副作用。
+            if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameManager.GameState.Playing)
                 return;
 
             float dt = Time.deltaTime;
@@ -158,6 +164,8 @@ namespace GameJam2026
             {
                 currentSpeed = 0f;
                 anchoring = false;
+                // 抛锚触底字幕提示（每次抛锚完成只触发一次）
+                if (SubtitleManager.Instance != null) SubtitleManager.Instance.Show(SubtitleAnchored);
             }
         }
 
@@ -184,6 +192,7 @@ namespace GameJam2026
         public void Salvage()
         {
             SalvageInventory inventory = SalvageInventory.Instance;
+            bool salvagedObjective = false;   // 本次是否打捞到主线目标（用于触发该关剧情字幕）
 
             // 先尝试捡取（若有货舱、有目标、有空间）；这样即便随后扣电导致复活，也已先拿到物品
             if (inventory != null)
@@ -191,12 +200,25 @@ namespace GameJam2026
                 SonarTarget target = FindNearestSalvageableTarget();
                 if (target != null && inventory.TryAdd(target.ItemName, target.Score, target.IsObjective))
                 {
+                    salvagedObjective = target.IsObjective;
                     Destroy(target.gameObject);
                 }
             }
 
             // 只要点击打捞就要扣电量（无论是否捡到东西）
             if (BatteryManager.Instance != null) BatteryManager.Instance.ConsumeSalvage();
+
+            // 打捞到主线目标：按当前关卡顺序播放对应剧情字幕
+            if (salvagedObjective) PlayLevelStorySequence();
+        }
+
+        /// <summary>取当前关卡的剧情字幕 id 并交给 SubtitleManager 顺序播放；未配置 / 无 SubtitleManager 则空操作。</summary>
+        private void PlayLevelStorySequence()
+        {
+            if (SubtitleManager.Instance == null || GameManager.Instance == null) return;
+            string[] ids = GameManager.Instance.GetLevelStorySubtitleIds(GameManager.Instance.CurrentLevelIndex);
+            if (ids != null && ids.Length > 0)
+                SubtitleManager.Instance.ShowSequence(ids);
         }
 
         /// <summary>找船周围 <see cref="salvageRange"/> 内最近的、可打捞的雷达目标（排除暗礁等 salvageable=false）；没有则返回 null。</summary>
@@ -228,6 +250,9 @@ namespace GameJam2026
 
             _reefCooldown = reefHitCooldown;
             if (BatteryManager.Instance != null) BatteryManager.Instance.ConsumeReefHit();
+
+            // 触礁字幕提示
+            if (SubtitleManager.Instance != null) SubtitleManager.Instance.Show(SubtitleHitReef);
         }
 
         // ===== 失败复活：监听电量耗尽，复活时把船停住 =====

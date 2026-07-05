@@ -15,11 +15,7 @@ namespace GameJam2026
         [Tooltip("电量填充 Image，需将 Image Type 设为 Filled")]
         [SerializeField] private Image fillImage = null;
 
-        private void OnEnable()
-        {
-            if (BatteryManager.Instance != null)
-                BatteryManager.Instance.OnBatteryChanged += HandleBatteryChanged;
-        }
+        private void OnEnable() => SafeSubscribe();
 
         private void OnDisable()
         {
@@ -29,9 +25,18 @@ namespace GameJam2026
 
         private void Start()
         {
-            // 解决跨对象初始化顺序：BatteryManager 在 Awake 已设好初值，这里立即刷新一次
-            if (BatteryManager.Instance != null)
-                HandleBatteryChanged(BatteryManager.Instance.CurrentBattery, BatteryManager.Instance.MaxBattery);
+            // Start 时所有 Awake 已跑完：补订阅一次（防 OnEnable 早于 BatteryManager.Awake 漏订）
+            SafeSubscribe();
+        }
+
+        /// <summary>幂等订阅 OnBatteryChanged（重复调用不会多次订阅）。
+        /// 订阅只接收”之后”的变化，故每次成功订阅时顺带刷新当前值，保证显示与电量一致。</summary>
+        private void SafeSubscribe()
+        {
+            if (BatteryManager.Instance == null) return;
+            BatteryManager.Instance.OnBatteryChanged -= HandleBatteryChanged;
+            BatteryManager.Instance.OnBatteryChanged += HandleBatteryChanged;
+            HandleBatteryChanged(BatteryManager.Instance.CurrentBattery, BatteryManager.Instance.MaxBattery);
         }
 
         private void HandleBatteryChanged(int current, int max)

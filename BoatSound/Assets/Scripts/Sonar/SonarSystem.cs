@@ -85,6 +85,13 @@ namespace GameJam2026
         [Tooltip("显示当前频段的文本（TMP），可不接")]
         [SerializeField] private Text bandLabel;
 
+        [Header("靠近目标字幕")]
+        [Tooltip("船距目标小于此值视为「靠近」，触发一次字幕；离开后再次靠近才会再次触发")]
+        [SerializeField] private float nearTargetRange = 2f;
+
+        [Tooltip("靠近目标检测间隔（秒）；节流 FindObjectsByType 调用频次")]
+        [SerializeField] private float nearCheckInterval = 0.25f;
+
         public SonarBand CurrentBand => currentBand;
 
         private SonarBand currentBand = SonarBand.Mid;
@@ -106,6 +113,11 @@ namespace GameJam2026
         private Material _defaultLineMat;             // 程序化线材质（缓存复用，扫描线/扫描环共用）
 
         private bool _active;   // 是否激活扫描（仅 Playing；其它状态停转并隐藏扫描视觉）
+
+        // 靠近目标字幕（id 需在 SubtitleDatabase 里建同名条目）
+        private const string SubtitleNearTarget = "NearTarget";
+        private readonly HashSet<SonarTarget> _nearTargets = new HashSet<SonarTarget>();
+        private float _nearCheckTimer;
 
         private void OnEnable() => SafeSubscribe();
 
@@ -229,6 +241,43 @@ namespace GameJam2026
                     Scan();
                 }
             }
+
+            // 靠近目标字幕（节流检测）
+            _nearCheckTimer += Time.deltaTime;
+            if (_nearCheckTimer >= nearCheckInterval)
+            {
+                _nearCheckTimer = 0f;
+                UpdateNearTarget();
+            }
+        }
+
+        /// <summary>检测船是否靠近某 SonarTarget：进入 nearTargetRange 内触发一次「已在目标附近」字幕，
+        /// 离开后再次靠近才会再次触发（按目标做滞回，避免贴着目标时反复刷屏）。</summary>
+        private void UpdateNearTarget()
+        {
+            if (boat == null) return;
+            Vector2 center = boat.position;
+            float sqrNear = nearTargetRange * nearTargetRange;
+
+            _nearTargets.RemoveWhere(t => t == null);
+
+            bool anyNewlyNear = false;
+            foreach (SonarTarget t in FindTargets())
+            {
+                if (t == null) continue;
+                float sqrDist = ((Vector2)t.transform.position - center).sqrMagnitude;
+                if (sqrDist <= sqrNear)
+                {
+                    if (_nearTargets.Add(t)) anyNewlyNear = true;   // Add 返回 true 表示本次新加入
+                }
+                else
+                {
+                    _nearTargets.Remove(t);
+                }
+            }
+
+            if (anyNewlyNear && SubtitleManager.Instance != null)
+                SubtitleManager.Instance.Show(SubtitleNearTarget);
         }
 
         private void OnDestroy()

@@ -947,7 +947,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9203790685525036378}
-  - component: {fileID: 9020001734263774142}
   - component: {fileID: 2329276227762190126}
   m_Layer: 0
   m_Name: EndPort
@@ -972,30 +971,6 @@ Transform:
   - {fileID: 7202156669522970498}
   m_Father: {fileID: 6180384355814177567}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9020001734263774142
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6354311752123482306}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a93b38bfbcad6d4f81b9d9c2e60907c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  autoTriggerSize: {x: 20, y: 20}
-  harborAnchor: {fileID: 0}
-  boat: {fileID: 0}
-  noObjectiveSubtitleId: HarborNoObjective
-  confirmPanel: {fileID: 0}
-  yesButton: {fileID: 0}
-  noButton: {fileID: 0}
-  resultPanel: {fileID: 0}
-  resultScoreText: {fileID: 0}
-  continueButton: {fileID: 0}
-  moveBoatToHarborOnEntry: 1
-  resultScorePrefix: "\u6700\u7EC8\u79EF\u5206\uFF1A"
 --- !u!61 &2329276227762190126
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -60,6 +60,9 @@ namespace GameJam2026
         // 暗礁碰撞免疫冷却
         private float _reefCooldown;
 
+        // 外部冻结（如入港确认面板弹出期间）：true 时瞬间停船并忽略全部输入
+        private bool _frozen;
+
         // 字幕 id（需在 SubtitleDatabase 里建同名条目）
         private const string SubtitleHitReef = "HitReef";
         private const string SubtitleAnchored = "Anchored";
@@ -77,6 +80,9 @@ namespace GameJam2026
             // （LevelSettled 时 timeScale 仍为 1，Update 照跑），看起来像「没到 endport / 又跑掉了」。
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameManager.GameState.Playing)
                 return;
+
+            // 外部冻结（如入港确认面板弹出期间）：瞬间停船并忽略推进 / 转向 / 抛锚输入
+            if (_frozen) return;
 
             float dt = Time.deltaTime;
 
@@ -286,14 +292,32 @@ namespace GameJam2026
             }
         }
 
-        /// <summary>清零全部运动状态（速度、抛锚、转向计时、暗礁冷却）。复活 / 换关时调用。</summary>
+        /// <summary>清零全部运动状态（速度、抛锚、转向计时、暗礁冷却）并解除外部冻结。复活 / 换关时调用。</summary>
         public void ResetMotion()
+        {
+            ClearMotionState();
+            _frozen = false;
+        }
+
+        /// <summary>清零运动数值（不动 <see cref="_frozen"/>）。</summary>
+        private void ClearMotionState()
         {
             currentSpeed = 0f;
             anchoring = false;
             _leftTimer = _rightTimer = 0f;
             _leftEngaged = _rightEngaged = false;
             _reefCooldown = 0f;
+        }
+
+        /// <summary>
+        /// 外部冻结开关：<paramref name="value"/>=true 时瞬间把船停住并忽略全部输入（推进 / 转向 / 抛锚），
+        /// 用于入港确认面板弹出期间强制停船；=false 恢复操控。换关 / 复活（<see cref="ResetMotion"/>）会自动解冻。
+        /// </summary>
+        public void SetFrozen(bool value)
+        {
+            _frozen = value;
+            // 冻结瞬间清零速度，否则船会带着残余 currentSpeed 继续按惯性漂出触发区
+            if (value) ClearMotionState();
         }
 
         // ===== 预留扩展点（后续阶段填充）=====

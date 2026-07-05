@@ -152,12 +152,17 @@ namespace GameJam2026
         private void ShowConfirm()
         {
             _awaitingResponse = true;
+            // 弹出确认面板期间强制停船：船往往正以高速驶入触发区，若继续按惯性前进 / 被玩家操控，
+            // 既会漂出触发区导致 OnTriggerExit2D 反复开关面板，玩家也难以边操船边做决定。
+            if (boat != null) boat.SetFrozen(true);
             SetActive(confirmPanel, true);
         }
 
         private void CloseConfirm()
         {
             _awaitingResponse = false;
+            // 关闭面板恢复操控：点「否」继续航行；点「是」随后会传送 + ResetMotion + 进 LevelSettled
+            if (boat != null) boat.SetFrozen(false);
             SetActive(confirmPanel, false);
         }
 

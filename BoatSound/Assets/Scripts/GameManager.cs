@@ -54,6 +54,17 @@ namespace GameJam2026
         /// <summary>当前关卡索引（0 起；-1 表示尚未开始任何关卡）。</summary>
         public int CurrentLevelIndex { get; private set; } = -1;
 
+        /// <summary>当前关的 LevelData（按 <see cref="CurrentLevelIndex"/> 从 levels 取；未开始关卡或越界时为 null）。
+        /// 供 UI 等系统读取当前关名（<see cref="LevelData.DisplayName"/>）等配置。</summary>
+        public LevelData CurrentLevelData
+        {
+            get
+            {
+                if (levels == null || CurrentLevelIndex < 0 || CurrentLevelIndex >= levels.Length) return null;
+                return levels[CurrentLevelIndex];
+            }
+        }
+
         /// <summary>跨关卡累计总分（每关结算时累加当关货舱分）。</summary>
         public int TotalScore { get; private set; }
 

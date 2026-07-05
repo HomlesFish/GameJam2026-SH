@@ -34,6 +34,10 @@ namespace GameJam2026
         [Tooltip("全通关结算界面的总分文本（可不接；单关结算分由 HarborEntryController 驱动）")]
         [SerializeField] private Text resultScoreText;
 
+        [Header("关卡名显示")]
+        [Tooltip("关卡名文本（显示当前关的 LevelData.displayName，如「第 1 关 · 浅滩」），换关时随 LevelStarted 自动更新；可不接")]
+        [SerializeField] private Text levelText;
+
         [Header("目标物品 UI（HUD 左上角，目标自动读取）")]
         [Tooltip("目标物品图标")]
         [SerializeField] private Image objectiveIcon;
@@ -84,6 +88,7 @@ namespace GameJam2026
                 ResolveObjective();
                 if (SalvageInventory.Instance != null) Rebuild();
                 RefreshObjectiveState();
+                RefreshLevelText();
             }
         }
 
@@ -96,6 +101,7 @@ namespace GameJam2026
             ResolveObjective();
             if (SalvageInventory.Instance != null) Rebuild();
             RefreshObjectiveState();   // 应用 目标图标 / 「√」 的显隐
+            RefreshLevelText();
             WireSoundButton();
 
             if (_objectiveReady && objectiveIcon != null && checkmarkSprite == null)
@@ -189,6 +195,15 @@ namespace GameJam2026
             bool obtained = SalvageInventory.Instance != null && SalvageInventory.Instance.HasObjective;
 
             if (checkmarkSprite != null) checkmarkSprite.gameObject.SetActive(obtained);
+        }
+
+        /// <summary>把关名填到 <see cref="levelText"/>：取当前关 <see cref="LevelData.DisplayName"/>（即 displayName 字段）。
+        /// LevelStarted 时 GameManager 已切到新关；尚未进入关卡（CurrentLevelData 为 null）则清空文本。</summary>
+        private void RefreshLevelText()
+        {
+            if (levelText == null) return;
+            LevelData data = GameManager.Instance != null ? GameManager.Instance.CurrentLevelData : null;
+            levelText.text = data != null ? data.DisplayName : string.Empty;
         }
 
         /// <summary>绑定喇叭按钮点击 → 播放目标物品音效（幂等：RemoveAllListeners 后再 Add，重复调用不会叠加监听）。</summary>

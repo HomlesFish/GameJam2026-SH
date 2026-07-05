@@ -20,10 +20,10 @@ namespace GameJam2026
     {
         [Header("推进")]
         [Tooltip("加速度（单位/秒²）。按住 W 时每秒增加的速度。")]
-        [SerializeField] private float acceleration = 3f;
+        [SerializeField] private float acceleration = 1f;
 
         [Tooltip("最大速度（单位/秒）。加速到此值后不再增加。")]
-        [SerializeField] private float maxSpeed = 6f;
+        [SerializeField] private float maxSpeed = 3f;
 
         [Header("转向")]
         [Tooltip("转向角速度（度/秒）。延迟结束后每秒转向的角度。")]

@@ -44,7 +44,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: f852bdb27e3650c41a0a7b7c6aa3bfdb, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -147,10 +147,10 @@ MonoBehaviour:
   tint: {r: 1, g: 1, b: 1, a: 1}
   pulseDuration: 1.5
   objectivePulseSpeed: 1.2
-  overrideClip: {fileID: 0}
+  overrideClip: {fileID: 8300000, guid: f852bdb27e3650c41a0a7b7c6aa3bfdb, type: 3}
   audioMaxDistance: 8
   uiIcon: {fileID: 0}
-  uiSoundClip: {fileID: 0}
+  uiSoundClip: {fileID: 8300000, guid: f852bdb27e3650c41a0a7b7c6aa3bfdb, type: 3}
   itemName: "\u9CB8\u9C7C"
   score: 10
   salvageable: 1

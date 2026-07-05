@@ -3901,6 +3901,81 @@ Transform:
   - {fileID: 1533817680}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1802258367
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1802258369}
+  - component: {fileID: 1802258368}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1802258368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802258367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcf3740b344aca341bfce5b9de2cbcfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ambCabin: {fileID: 8300000, guid: d0b482e2efc0ca74d9d340c73ceb8e17, type: 3}
+  ambElectronics: {fileID: 8300000, guid: 110ad4700253f1947b0c01a9056456da, type: 3}
+  radarSweepLoop: {fileID: 0}
+  engineIdle: {fileID: 8300000, guid: 1f5d55d2d874a854a8b2b2674b6d741f, type: 3}
+  ambLowPower: {fileID: 8300000, guid: b31e9ca32f87a82419a2af5b855208f9, type: 3}
+  hullCreaks:
+  - {fileID: 8300000, guid: dfd2e33962868e449a91334abb950c32, type: 3}
+  - {fileID: 8300000, guid: 6edb34c104d203849a081e06be6947c1, type: 3}
+  - {fileID: 8300000, guid: 27d8cbd737f27c24a8219f74c0892034, type: 3}
+  - {fileID: 8300000, guid: 726d4c106f21c19458c0383c26c30a78, type: 3}
+  radioStatic: {fileID: 8300000, guid: cd77e232957438a4ba6719c12c91d162, type: 3}
+  btnPressLight: {fileID: 8300000, guid: 0a2d97f0d4cfa4b45ae1d10e6ae045a7, type: 3}
+  btnPressHeavy: {fileID: 8300000, guid: 14811554845cbb84ba24c280aa400861, type: 3}
+  btnFreqTune: {fileID: 8300000, guid: 3e8f93554e5b859478a6d7bdf3bf4ff8, type: 3}
+  btnDenied: {fileID: 8300000, guid: 58a0eb1e33af7e9439186785f365d735, type: 3}
+  uiDing: {fileID: 8300000, guid: 00e916612eb9af34c85f40e7f76ede75, type: 3}
+  anchorDrop: {fileID: 8300000, guid: d9c88f4d031c2044783baafe839d4945, type: 3}
+  salvageSuccess: {fileID: 8300000, guid: f30e9f2da45423046aa213f4eb159ac2, type: 3}
+  reefImpact: {fileID: 8300000, guid: 77980cec601012f4db1741d18280b04a, type: 3}
+  depthChargeExplode: {fileID: 8300000, guid: a3a538542d6768e47bd9a3c2f94c1540, type: 3}
+  lowPowerWarn: {fileID: 8300000, guid: 081565f28d157804ba22fca6cc3b08d4, type: 3}
+  enginePitchMax: 1.26
+  listenDuckFactor: 0.35
+  duckFadeTime: 0.2
+  lowPowerThreshold: 25
+  warnIntervalMax: 2
+  warnIntervalMin: 0.8
+  creakIntervalMin: 15
+  creakIntervalMax: 40
+  radarInterval: 5
+  radarVolume: 0.25
+--- !u!4 &1802258369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802258367}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1821903403
 GameObject:
   m_ObjectHideFlags: 0
@@ -4628,6 +4703,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1374608377289524693, guid: 93c34bc41b378394bbba9c796c3c5489, type: 3}
+      propertyPath: explosionClip
+      value: 
+      objectReference: {fileID: 8300000, guid: a3a538542d6768e47bd9a3c2f94c1540, type: 3}
     - target: {fileID: 4592181058060783334, guid: 93c34bc41b378394bbba9c796c3c5489, type: 3}
       propertyPath: m_Name
       value: Boat
@@ -4689,3 +4768,4 @@ SceneRoots:
   - {fileID: 4592374781406978529}
   - {fileID: 853683157}
   - {fileID: 971037448}
+  - {fileID: 1802258369}

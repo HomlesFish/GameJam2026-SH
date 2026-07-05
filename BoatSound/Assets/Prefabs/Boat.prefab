@@ -139,7 +139,6 @@ MonoBehaviour:
   turnRate: 90
   turnDelay: 1
   anchorDuration: 2
-  anchorKey: 32
   reefHitCooldown: 1
   salvageRange: 2
   currentSpeed: 0
@@ -243,7 +242,7 @@ MonoBehaviour:
   - Reef
   - Fish
   - Dolphin
-  explosionClip: {fileID: 0}
+  explosionClip: {fileID: 8300000, guid: a3a538542d6768e47bd9a3c2f94c1540, type: 3}
   explosionColor: {r: 1, g: 0.55, b: 0.2, a: 1}
   explosionDuration: 0.4
   explosionWidth: 0.14

@@ -47,6 +47,9 @@ namespace GameJam2026
         [SerializeField] private float heading;          // 船头朝向（度），0 = 指向 +Y
         [SerializeField] private bool anchoring;
 
+        /// <summary>当前速度比例 0~1（当前速度/最大速度）。供 SoundManager 引擎变调每帧轮询，只读。</summary>
+        public float Speed01 => maxSpeed > 0f ? currentSpeed / maxSpeed : 0f;
+
         // 转向计时：每个方向各自累计按住时长，达到 turnDelay 后 engaged
         private float _leftTimer;
         private float _rightTimer;
@@ -159,6 +162,13 @@ namespace GameJam2026
             // 重置转向计时，避免减速结束后带着残余的“待生效”转向
             _leftTimer = _rightTimer = 0f;
             _leftEngaged = _rightEngaged = false;
+
+            // 音效：抛锚按钮重按 + 链条入水下放（素材末尾自带触底闷响，与 2 秒减速大致同步）
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayAnchorButton();
+                SoundManager.Instance.PlayAnchorDrop();
+            }
         }
 
         /// <summary>抛锚减速：在 anchorDuration 秒内把速度线性降到 0。</summary>
@@ -201,6 +211,7 @@ namespace GameJam2026
         {
             SalvageInventory inventory = SalvageInventory.Instance;
             bool salvagedObjective = false;   // 本次是否打捞到主线目标（用于触发该关剧情字幕）
+            bool salvagedSomething = false;   // 本次是否捡到任何东西（用于播放成功/落空音效）
 
             // 先尝试捡取（若有货舱、有目标、有空间）；这样即便随后扣电导致复活，也已先拿到物品
             if (inventory != null)
@@ -209,12 +220,20 @@ namespace GameJam2026
                 if (target != null && inventory.TryAdd(target.ItemName, target.Score, target.IsObjective))
                 {
                     salvagedObjective = target.IsObjective;
+                    salvagedSomething = true;
                     Destroy(target.gameObject);
                 }
             }
 
             // 只要点击打捞就要扣电量（无论是否捡到东西）
             if (BatteryManager.Instance != null) BatteryManager.Instance.ConsumeSalvage();
+
+            // 音效：捕捞按钮重按 + 结果音（成功=绞盘重载出水；落空=成功素材变调的空钩轻载）
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlaySalvageButton();
+                SoundManager.Instance.PlaySalvageResult(salvagedSomething);
+            }
 
             // 打捞到主线目标：按当前关卡顺序播放对应剧情字幕
             if (salvagedObjective) PlayLevelStorySequence();
@@ -258,6 +277,9 @@ namespace GameJam2026
 
             _reefCooldown = reefHitCooldown;
             if (BatteryManager.Instance != null) BatteryManager.Instance.ConsumeReefHit();
+
+            // 音效：撞击巨响
+            if (SoundManager.Instance != null) SoundManager.Instance.PlayReefImpact();
 
             // 触礁字幕提示
             if (SubtitleManager.Instance != null) SubtitleManager.Instance.Show(SubtitleHitReef);

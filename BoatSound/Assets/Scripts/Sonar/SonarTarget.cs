@@ -7,8 +7,8 @@ namespace GameJam2026
     /// 可被声呐探测的物体。挂在场景里的目标上。
     /// - <see cref="band"/>：所属频段（决定显示用图片/颜色，以及听声音频）。
     /// - <see cref="isObjective"/>：主线任务目标，始终显示为光点（不随刷新淡出）。
-    /// - 按 ping 时由 SonarSystem 驱动 <see cref="PlayPingSound"/>，以 3D 声音**一次性**发声：
-    ///   音量随到船（AudioListener）的距离衰减、带左右方向。
+    /// - 按 ping 时由 SonarSystem 驱动 <see cref="PlayPingSound"/>，经 SoundManager 以 2D **一次性**发声：
+    ///   不走 3D 距离衰减（永远可听见），并按目标相对船的方位做左右声道 pan。
     ///
     /// 普通目标平时隐藏（alpha=0）；被 SonarSystem 扫描命中且在范围内时由 OnPing() 闪现一次。
     ///
@@ -21,7 +21,6 @@ namespace GameJam2026
     /// HUD 目标物品：主线目标（isObjective）的 <see cref="uiIcon"/> 与 <see cref="uiSoundClip"/> 由 SonarUIController 读取，
     /// 显示在 HUD 左上角（图标 + 喇叭音效）；**每关不同**，在该关的主线目标上配置即可，UI 会自动取用。
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
     public class SonarTarget : MonoBehaviour
     {
         [Tooltip("所属频段")]
@@ -42,9 +41,6 @@ namespace GameJam2026
         [Header("听声音频")]
         [Tooltip("该物体自己的声音（可选）。留空则用 SonarSystem 里当前频段的默认音")]
         [SerializeField] private AudioClip overrideClip;
-
-        [Tooltip("3D 声音衰减最大距离（单位）。超出此距离基本听不见")]
-        [SerializeField] private float audioMaxDistance = 8f;
 
         [Header("HUD 目标物品（仅 isObjective 时由 SonarUIController 读取）")]
         [Tooltip("HUD 左上角显示的目标物品图标。每关不同——在该关的主线目标（isObjective）上配置")]
@@ -89,7 +85,6 @@ namespace GameJam2026
         public bool Destructible => destructible;
 
         private SpriteRenderer _renderer;
-        private AudioSource _audio;
         private Coroutine _pulseRoutine;
 
         private void Awake()
@@ -102,20 +97,6 @@ namespace GameJam2026
             else
             {
                 _renderer.color = new Color(tint.r, tint.g, tint.b, isObjective ? 1f : 0f);
-            }
-
-            // 配置 3D 声音：听者在船上，音量随距离衰减、带左右方向；一次性播放（ping）
-            _audio = GetComponent<AudioSource>();
-            if (_audio != null)
-            {
-                _audio.playOnAwake = false;
-                _audio.loop = false;               // ping 为一次性播放
-                _audio.spatialBlend = 1f;          // 完全 3D
-                _audio.dopplerLevel = 0f;          // 避免相对运动造成的变调
-                _audio.spread = 0f;
-                _audio.rolloffMode = AudioRolloffMode.Logarithmic;
-                _audio.minDistance = 0.3f;
-                _audio.maxDistance = audioMaxDistance;
             }
         }
 
@@ -138,13 +119,13 @@ namespace GameJam2026
             _pulseRoutine = StartCoroutine(PulseRoutine());
         }
 
-        /// <summary>按 ping 时调用：用 clip 一次性播放该物体的 3D 声音（音量随到听者距离衰减、带方向）。</summary>
+        /// <summary>按 ping 时调用：经 SoundManager 以 2D 一次性播放该物体的听声音
+        /// （不走 3D 距离衰减，永远可听见；按目标相对船的方位做左右声道 pan）。</summary>
         public void PlayPingSound(AudioClip clip)
         {
-            if (_audio == null || clip == null) return;
-            _audio.loop = false;
-            _audio.clip = clip;
-            _audio.Play();
+            if (clip == null) return;
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlaySonarPing(clip, transform.position);
         }
 
         private IEnumerator PulseRoutine()

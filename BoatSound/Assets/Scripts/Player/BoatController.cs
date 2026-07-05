@@ -341,13 +341,5 @@ namespace GameJam2026
             // 冻结瞬间清零速度，否则船会带着残余 currentSpeed 继续按惯性漂出触发区
             if (value) ClearMotionState();
         }
-
-        // ===== 预留扩展点（后续阶段填充）=====
-
-        /// <summary>交互（如发射声呐 ping）。留给后续声呐系统调用。</summary>
-        public virtual void Interact() { /* TODO: 声呐等 */ }
-
-        /// <summary>受击。返回是否成功受到伤害（可用于无敌帧判断）。</summary>
-        public virtual bool TakeDamage(int amount) { /* TODO: 按需求实现 */ return false; }
     }
 }

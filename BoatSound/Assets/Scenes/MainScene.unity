@@ -1318,7 +1318,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -7.5, y: 0}
   m_SizeDelta: {x: 129, y: 67}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &555912894
@@ -1394,8 +1394,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a2826ce2aeefb1744ac62d0bdb0b9799, type: 2}
   - {fileID: 11400000, guid: 443899cb592a2654d8d7365ba5978799, type: 2}
   - {fileID: 11400000, guid: 83b9b5f4b69f35b4fbb932e7e1715b04, type: 2}
-  - {fileID: 11400000, guid: e1b357875e0095544996bd8e5d3b65de, type: 2}
-  - {fileID: 11400000, guid: 180dfae1ae2107649beca674480458a2, type: 2}
   levelContainer: {fileID: 1352513748}
   boat: {fileID: 1147676479}
 --- !u!4 &562988730
@@ -2228,10 +2226,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 696482872}
   - {fileID: 2022959970}
   - {fileID: 1388525028}
   - {fileID: 706487267}
+  - {fileID: 696482872}
   - {fileID: 554611682}
   - {fileID: 2114263835}
   m_Father: {fileID: 0}
@@ -4432,7 +4430,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6991317207577568925, guid: 93c34bc41b378394bbba9c796c3c5489, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 130
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 6991317207577568925, guid: 93c34bc41b378394bbba9c796c3c5489, type: 3}
       propertyPath: m_LocalRotation.w

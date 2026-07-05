@@ -49,6 +49,9 @@ namespace GameJam2026
         /// <summary>电量首次归 0 时触发一次（在重置之前）。可用于播放失败音效/闪屏等。</summary>
         public event Action OnBatteryEmpty;
 
+        // 字幕 id（需在 SubtitleDatabase 里建同名条目，文本如「电量耗尽，回到出发点重新开始」）
+        private const string SubtitleBatteryEmpty = "BatteryEmpty";
+
         protected override void Awake()
         {
             base.Awake();   // 完成单例注册（必须调用）
@@ -96,6 +99,9 @@ namespace GameJam2026
 
         private void HandleEmpty()
         {
+            // 先弹「电量耗尽」字幕提示，再传送、再重置电量（满足"先提示→再传送→最后重置电量"的时序）
+            if (SubtitleManager.Instance != null) SubtitleManager.Instance.Show(SubtitleBatteryEmpty);
+
             // 此时 CurrentBattery 仍为 0；订阅者可据此播放失败反馈
             OnBatteryEmpty?.Invoke();
             // 广播失败：GameManager 传送船回出生点、BoatController 清速、DepthChargeLauncher 补弹

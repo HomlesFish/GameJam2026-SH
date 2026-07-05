@@ -10,7 +10,7 @@ namespace GameJam2026
     ///   2. 转向：按住 A/D，经过 <see cref="turnDelay"/> 秒反应延迟后，开始以
     ///            <see cref="turnRate"/> 的角速度持续转向；松开立即停止。
     ///            点按（按住不足延迟时间）不产生转向。
-    ///   3. 抛锚：按下 <see cref="anchorKey"/>，速度在 <see cref="anchorDuration"/> 秒内线性降到 0；
+    ///   3. 抛锚：点击 UI 抛锚按钮（<see cref="BeginAnchor"/>），速度在 <see cref="anchorDuration"/> 秒内线性降到 0；
     ///            抛锚期间 W/A/D 均无效。
     ///
     /// 实现：Transform + 手写速度积分（不用 Rigidbody），便于精确控制延迟与线性减速。
@@ -36,9 +36,6 @@ namespace GameJam2026
         [Tooltip("抛锚减速时长（秒）。速度在此时间内线性降到 0。")]
         [SerializeField] private float anchorDuration = 2f;
 
-        [Tooltip("抛锚按键。")]
-        [SerializeField] private KeyCode anchorKey = KeyCode.Space;
-        
         [Tooltip("碰撞暗礁后的免疫时长（秒），防止重叠时持续掉电")]
         [SerializeField] private float reefHitCooldown = 1f;
 
@@ -78,7 +75,6 @@ namespace GameJam2026
             // 仅在关卡进行中响应输入与移动：暂停 / 单关结算 / 全通关 / 主菜单期间一律冻结。
             // 否则结算确认把船传送到 endport 后，残留的 currentSpeed 会在下一帧把船推出港口
             // （LevelSettled 时 timeScale 仍为 1，Update 照跑），看起来像「没到 endport / 又跑掉了」。
-            // 额外 return 也避免暂停时按 Space 触发 BeginAnchor 等输入副作用。
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameManager.GameState.Playing)
                 return;
 
@@ -87,11 +83,6 @@ namespace GameJam2026
             if (anchoring)
             {
                 UpdateAnchor(dt);
-            }
-            else if (Input.GetKeyDown(anchorKey) && currentSpeed > 0.0001f)
-            {
-                // 抛锚优先：一旦触发即进入减速，期间忽略推进/转向
-                BeginAnchor();
             }
             else
             {
@@ -143,8 +134,19 @@ namespace GameJam2026
             return false;
         }
 
-        private void BeginAnchor()
+        /// <summary>
+        /// 抛锚操作：UI 抛锚按钮的 OnClick 可直接绑定本方法（与 <see cref="Salvage"/> 同样的绑定方式）。
+        /// 仅在关卡进行中、船正在移动、且当前未抛锚时生效；触发后在 <see cref="anchorDuration"/> 秒内
+        /// 把速度线性降到 0，期间推进 / 转向 / 再次点击均被忽略。
+        /// </summary>
+        public void BeginAnchor()
         {
+            // 与原 Update 中的按键门禁保持一致：非进行中 / 已在抛锚 / 船已停 一律不响应。
+            // UI 按钮不经过 Update 的状态门禁，必须在此自检，避免暂停 / 结算期间误触。
+            if (anchoring) return;
+            if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
+            if (currentSpeed <= 0.0001f) return;
+
             anchoring = true;
             _anchorElapsed = 0f;
             _anchorStartSpeed = currentSpeed;
